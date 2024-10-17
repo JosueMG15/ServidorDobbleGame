@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Logica;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -9,10 +11,42 @@ namespace DobbleServicio
 {
     public partial class ServicioImplementacion : IGestionJugador
     {
-        public bool Registro()
+        public bool RegistrarUsuario(CuentaUsuario cuentaUsuario)
         {
-            Console.WriteLine("Hola");
-            return true;
+            bool resultado = false;
+            try
+            {
+                RegistroUsuario.RegistrarUsuario(cuentaUsuario);
+                resultado = true;
+            }
+            catch (EntityException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return resultado;
+        }
+
+        public bool ExisteNombreUsuario(string nombreUsuario)
+        {
+            bool existeNombre = false;
+            try
+            {
+                RegistroUsuario.ExisteNombreUsuario(nombreUsuario);
+                existeNombre = true;
+            }
+            catch (EntityException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return existeNombre;
         }
     }
 

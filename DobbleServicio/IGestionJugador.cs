@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logica;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -11,6 +12,10 @@ namespace DobbleServicio
     public interface IGestionJugador
     {
         [OperationContract]
-        bool Registro();
+        bool RegistrarUsuario(CuentaUsuario cuentaUsuario);
+        [OperationContract]
+        bool ExisteNombreUsuario(string nombreUsuario);
+
     }
+    
 }
