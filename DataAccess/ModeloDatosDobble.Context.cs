@@ -13,10 +13,10 @@ namespace DataAccess
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class DobbleBDEntities : DbContext
+    public partial class ModeloDatosDobbleContainer : DbContext
     {
-        public DobbleBDEntities()
-            : base("name=DobbleBDEntities")
+        public ModeloDatosDobbleContainer()
+            : base("name=ModeloDatosDobbleContainer")
         {
         }
     

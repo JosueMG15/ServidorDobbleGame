@@ -4,14 +4,14 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="908df7a5189e4b1f86fae1faa8cf7fc8" Name="Diagram1" ZoomLevel="74">
-        <EntityTypeShape EntityType="DobbleBDModel.Cuenta_Usuario" Width="1.5" PointX="10" PointY="5.375" />
-        <EntityTypeShape EntityType="DobbleBDModel.Estado_SolicitudAmistad" Width="1.5" PointX="6.375" PointY="0.5" />
-        <EntityTypeShape EntityType="DobbleBDModel.Relaciones_Amistad" Width="1.5" PointX="9.875" PointY="1.375" />
-        <EntityTypeShape EntityType="DobbleBDModel.Usuario" Width="1.5" PointX="7" PointY="5.125" />
-        <AssociationConnector Association="DobbleBDModel.FK_CuentaUsuario_Usuario" />
-        <AssociationConnector Association="DobbleBDModel.FK_Estado_SolicitudAmistad_idEstado_SolicitudAmistad" />
-        <AssociationConnector Association="DobbleBDModel.FK_Relaciones_Amistad_Usuario" />
+      <Diagram DiagramId="792d0f71a90c4275abaf677a99a96a85" Name="Diagram1" ZoomLevel="78" >
+        <EntityTypeShape EntityType="ModeloDatosDobble.Cuenta_Usuario" Width="1.5" PointX="3" PointY="6.25" />
+        <EntityTypeShape EntityType="ModeloDatosDobble.Estado_SolicitudAmistad" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="ModeloDatosDobble.Relaciones_Amistad" Width="1.5" PointX="3" PointY="2.5" />
+        <EntityTypeShape EntityType="ModeloDatosDobble.Usuario" Width="1.5" PointX="0.75" PointY="3.5" />
+        <AssociationConnector Association="ModeloDatosDobble.FK_CuentaUsuario_Usuario" />
+        <AssociationConnector Association="ModeloDatosDobble.FK_Estado_SolicitudAmistad_idEstado_SolicitudAmistad" />
+        <AssociationConnector Association="ModeloDatosDobble.FK_Relaciones_Amistad_Usuario" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

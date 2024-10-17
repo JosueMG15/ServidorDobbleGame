@@ -12,7 +12,7 @@ namespace Logica
         public static bool RegistrarUsuario(CuentaUsuario cuentaUsuario)
         {
             bool resultado = false;
-            using (var contexto = new DobbleBDEntidades())
+            using (var contexto = new ModeloDatosDobbleContainer())
             {
                 Cuenta_Usuario nuevaCuentaUsuario = new Cuenta_Usuario()
                 {
@@ -38,7 +38,7 @@ namespace Logica
 
         public static bool ExisteNombreUsuario(string nombreUsuario)
         {
-            using (var contexto = new DobbleBDEntidades())
+            using (var contexto = new ModeloDatosDobbleContainer())
             {
                 return (from cuentaUsuario in contexto.Cuenta_Usuario
                         where cuentaUsuario.usuario == nombreUsuario
