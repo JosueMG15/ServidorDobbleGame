@@ -56,7 +56,6 @@
     <Compile Include="Amistad.cs">
       <DependentUpon>ModeloDatosDobble.tt</DependentUpon>
     </Compile>
-    <Compile Include="Class1.cs" />
     <Compile Include="Cuenta.cs">
       <DependentUpon>ModeloDatosDobble.tt</DependentUpon>
     </Compile>
