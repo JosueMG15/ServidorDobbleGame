@@ -15,6 +15,10 @@ namespace DobbleServicio
         bool RegistrarUsuario(CuentaUsuario cuentaUsuario);
         [OperationContract]
         bool ExisteNombreUsuario(string nombreUsuario);
+        [OperationContract]
+        bool ExisteCorreoAsociado(string correoUsuario);
+        [OperationContract]
+        CuentaUsuario IniciarSesionJugador(string nombreUsuario, string contraseña);
 
     }
     

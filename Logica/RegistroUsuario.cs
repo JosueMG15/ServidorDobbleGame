@@ -40,10 +40,45 @@ namespace Logica
         {
             using (var contexto = new DobbleBDEntidades())
             {
-                return (from cuentaUsuario in contexto.Cuenta
-                        where cuentaUsuario.nombreUsuario == nombreUsuario
-                        select cuentaUsuario).Any();
+                return (from cuenta in contexto.Cuenta
+                        where cuenta.nombreUsuario == nombreUsuario
+                        select cuenta).Any();
             }
+        }
+
+        public static bool ExisteCorreoAsociado(string correoUsuario)
+        {
+            using (var contexto = new DobbleBDEntidades())
+            {
+                return (from cuenta in contexto.Cuenta
+                        where cuenta.correo ==  correoUsuario
+                        select cuenta).Any();
+            }
+        }
+
+        //podría estar en otra clase
+        public static CuentaUsuario IniciarSesion(string nombreUsuario, string contraseña)
+        {
+            CuentaUsuario cuentaUsuario = null;
+            using (var contexto = new DobbleBDEntidades())
+            {
+                cuentaUsuario = (from cuenta in contexto.Cuenta
+                                 join usuario in contexto.Usuario
+                                 on cuenta.Usuario.idUsuario 
+                                 equals usuario.idUsuario
+                                 where cuenta.nombreUsuario == nombreUsuario
+                                 && cuenta.contraseña == contraseña
+                                 select new CuentaUsuario
+                                 {
+                                     IdCuentaUsuario = cuenta.idCuenta,
+                                     Usuario = cuenta.nombreUsuario,
+                                     Correo = cuenta.correo,
+                                     Contraseña = cuenta.contraseña,
+                                     Foto = usuario.foto,
+                                     Puntaje = usuario.puntaje.Value,
+                                 }).FirstOrDefault();
+            }
+            return cuentaUsuario;
         }
     }
 }

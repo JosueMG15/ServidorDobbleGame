@@ -35,8 +35,7 @@ namespace DobbleServicio
             bool existeNombre = true;
             try
             {
-                RegistroUsuario.ExisteNombreUsuario(nombreUsuario);
-                existeNombre = false;
+                existeNombre = RegistroUsuario.ExisteNombreUsuario(nombreUsuario); 
             }
             catch (EntityException e)
             {
@@ -47,6 +46,44 @@ namespace DobbleServicio
                 Console.WriteLine(e.Message);
             }
             return existeNombre;
+        }
+
+        public bool ExisteCorreoAsociado(string correo)
+        {
+            bool existeCorreo = true;
+            try
+            {
+                existeCorreo = RegistroUsuario.ExisteCorreoAsociado(correo);
+            }
+            catch (EntityException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return existeCorreo;
+        }
+
+        public CuentaUsuario IniciarSesionJugador(string nombreUsuario, string contraseña)
+        {
+            CuentaUsuario cuentaUsuario = null;
+
+            try
+            {
+                cuentaUsuario = IniciarSesionJugador(nombreUsuario, contraseña);
+            }
+            catch (EntityException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            return cuentaUsuario;
         }
     }
 
