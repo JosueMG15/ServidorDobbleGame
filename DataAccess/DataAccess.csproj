@@ -53,11 +53,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="Cuenta_Usuario.cs">
+    <Compile Include="Amistad.cs">
       <DependentUpon>ModeloDatosDobble.tt</DependentUpon>
     </Compile>
-    <Compile Include="Estado_SolicitudAmistad.cs">
+    <Compile Include="Class1.cs" />
+    <Compile Include="Cuenta.cs">
+      <DependentUpon>ModeloDatosDobble.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EstadoAmistad.cs">
       <DependentUpon>ModeloDatosDobble.tt</DependentUpon>
     </Compile>
     <Compile Include="ModeloDatosDobble.Context.cs">
@@ -76,8 +79,10 @@
       <DependentUpon>ModeloDatosDobble.edmx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Relaciones_Amistad.cs">
-      <DependentUpon>ModeloDatosDobble.tt</DependentUpon>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Usuario.cs">
       <DependentUpon>ModeloDatosDobble.tt</DependentUpon>
@@ -93,6 +98,10 @@
       <DependentUpon>ModeloDatosDobble.edmx</DependentUpon>
     </None>
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
@@ -103,13 +112,13 @@
   <ItemGroup>
     <Content Include="ModeloDatosDobble.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ModeloDatosDobble.Context.cs</LastGenOutput>
       <DependentUpon>ModeloDatosDobble.edmx</DependentUpon>
+      <LastGenOutput>ModeloDatosDobble.Context.cs</LastGenOutput>
     </Content>
     <Content Include="ModeloDatosDobble.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ModeloDatosDobble.cs</LastGenOutput>
       <DependentUpon>ModeloDatosDobble.edmx</DependentUpon>
+      <LastGenOutput>ModeloDatosDobble.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

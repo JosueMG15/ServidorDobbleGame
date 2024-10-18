@@ -4,237 +4,278 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="ModeloDatosDobble.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="Cuenta_Usuario">
+      <Schema Namespace="DobbleBDModelo.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Amistad">
           <Key>
-            <PropertyRef Name="idCuenta_Usuario" />
+            <PropertyRef Name="idAmistad" />
           </Key>
-          <Property Name="idCuenta_Usuario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="usuario" Type="varchar" MaxLength="15" />
-          <Property Name="correo" Type="varchar" MaxLength="30" />
-          <Property Name="contraseña" Type="varchar" MaxLength="100" />
-          <Property Name="Usuario_idUsuario" Type="int" />
+          <Property Name="idAmistad" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EstadoAmistadId" Type="int" Nullable="false" />
+          <Property Name="UsuarioPrincipalId" Type="int" Nullable="false" />
+          <Property Name="UsuarioAmigoId" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="Estado_SolicitudAmistad">
+        <EntityType Name="Cuenta">
           <Key>
-            <PropertyRef Name="idEstado_SolicitudAmistad" />
+            <PropertyRef Name="idCuenta" />
           </Key>
-          <Property Name="idEstado_SolicitudAmistad" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="estado" Type="varchar" MaxLength="45" />
+          <Property Name="idCuenta" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombreUsuario" Type="nvarchar" MaxLength="15" Nullable="false" />
+          <Property Name="correo" Type="nvarchar" MaxLength="60" Nullable="false" />
+          <Property Name="contraseña" Type="nvarchar" MaxLength="40" Nullable="false" />
         </EntityType>
-        <EntityType Name="Relaciones_Amistad">
+        <EntityType Name="EstadoAmistad">
           <Key>
-            <PropertyRef Name="idAmigo" />
+            <PropertyRef Name="idEstadoAmistad" />
           </Key>
-          <Property Name="idAmigo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Usuario_idUsuario" Type="int" />
-          <Property Name="Estado_SolicitudAmistad_idEstado_SolicitudAmistad" Type="int" />
+          <Property Name="idEstadoAmistad" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="estado" Type="nvarchar" MaxLength="20" Nullable="false" />
         </EntityType>
         <EntityType Name="Usuario">
           <Key>
             <PropertyRef Name="idUsuario" />
           </Key>
-          <Property Name="idUsuario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="idUsuario" Type="int" Nullable="false" />
           <Property Name="foto" Type="varbinary(max)" />
           <Property Name="puntaje" Type="int" />
         </EntityType>
-        <Association Name="FK_CuentaUsuario_Usuario">
-          <End Role="Usuario" Type="Self.Usuario" Multiplicity="0..1">
+        <Association Name="FK_Amistad_EstadoAmistad">
+          <End Role="EstadoAmistad" Type="Self.EstadoAmistad" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Role="Cuenta_Usuario" Type="Self.Cuenta_Usuario" Multiplicity="*" />
+          <End Role="Amistad" Type="Self.Amistad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EstadoAmistad">
+              <PropertyRef Name="idEstadoAmistad" />
+            </Principal>
+            <Dependent Role="Amistad">
+              <PropertyRef Name="EstadoAmistadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Amistad_UsuarioAmigo">
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="1" />
+          <End Role="Amistad" Type="Self.Amistad" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Usuario">
               <PropertyRef Name="idUsuario" />
             </Principal>
-            <Dependent Role="Cuenta_Usuario">
-              <PropertyRef Name="Usuario_idUsuario" />
+            <Dependent Role="Amistad">
+              <PropertyRef Name="UsuarioAmigoId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Estado_SolicitudAmistad_idEstado_SolicitudAmistad">
-          <End Role="Estado_SolicitudAmistad" Type="Self.Estado_SolicitudAmistad" Multiplicity="0..1" />
-          <End Role="Relaciones_Amistad" Type="Self.Relaciones_Amistad" Multiplicity="*" />
+        <Association Name="FK_Amistad_UsuarioPrincipal">
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Amistad" Type="Self.Amistad" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Estado_SolicitudAmistad">
-              <PropertyRef Name="idEstado_SolicitudAmistad" />
+            <Principal Role="Usuario">
+              <PropertyRef Name="idUsuario" />
             </Principal>
-            <Dependent Role="Relaciones_Amistad">
-              <PropertyRef Name="Estado_SolicitudAmistad_idEstado_SolicitudAmistad" />
+            <Dependent Role="Amistad">
+              <PropertyRef Name="UsuarioPrincipalId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Relaciones_Amistad_Usuario">
+        <Association Name="FK_Usuario_Cuenta">
+          <End Role="Cuenta" Type="Self.Cuenta" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="Usuario" Type="Self.Usuario" Multiplicity="0..1" />
-          <End Role="Relaciones_Amistad" Type="Self.Relaciones_Amistad" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Usuario">
-              <PropertyRef Name="idUsuario" />
+            <Principal Role="Cuenta">
+              <PropertyRef Name="idCuenta" />
             </Principal>
-            <Dependent Role="Relaciones_Amistad">
-              <PropertyRef Name="Usuario_idUsuario" />
+            <Dependent Role="Usuario">
+              <PropertyRef Name="idUsuario" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="ModeloDatosDobbleStoreContainer">
-          <EntitySet Name="Cuenta_Usuario" EntityType="Self.Cuenta_Usuario" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Estado_SolicitudAmistad" EntityType="Self.Estado_SolicitudAmistad" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Relaciones_Amistad" EntityType="Self.Relaciones_Amistad" Schema="dbo" store:Type="Tables" />
+        <EntityContainer Name="DobbleBDModeloStoreContainer">
+          <EntitySet Name="Amistad" EntityType="Self.Amistad" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Cuenta" EntityType="Self.Cuenta" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EstadoAmistad" EntityType="Self.EstadoAmistad" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuario" EntityType="Self.Usuario" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_CuentaUsuario_Usuario" Association="Self.FK_CuentaUsuario_Usuario">
-            <End Role="Usuario" EntitySet="Usuario" />
-            <End Role="Cuenta_Usuario" EntitySet="Cuenta_Usuario" />
+          <AssociationSet Name="FK_Amistad_EstadoAmistad" Association="Self.FK_Amistad_EstadoAmistad">
+            <End Role="EstadoAmistad" EntitySet="EstadoAmistad" />
+            <End Role="Amistad" EntitySet="Amistad" />
           </AssociationSet>
-          <AssociationSet Name="FK_Estado_SolicitudAmistad_idEstado_SolicitudAmistad" Association="Self.FK_Estado_SolicitudAmistad_idEstado_SolicitudAmistad">
-            <End Role="Estado_SolicitudAmistad" EntitySet="Estado_SolicitudAmistad" />
-            <End Role="Relaciones_Amistad" EntitySet="Relaciones_Amistad" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Relaciones_Amistad_Usuario" Association="Self.FK_Relaciones_Amistad_Usuario">
+          <AssociationSet Name="FK_Amistad_UsuarioAmigo" Association="Self.FK_Amistad_UsuarioAmigo">
             <End Role="Usuario" EntitySet="Usuario" />
-            <End Role="Relaciones_Amistad" EntitySet="Relaciones_Amistad" />
+            <End Role="Amistad" EntitySet="Amistad" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Amistad_UsuarioPrincipal" Association="Self.FK_Amistad_UsuarioPrincipal">
+            <End Role="Usuario" EntitySet="Usuario" />
+            <End Role="Amistad" EntitySet="Amistad" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Usuario_Cuenta" Association="Self.FK_Usuario_Cuenta">
+            <End Role="Cuenta" EntitySet="Cuenta" />
+            <End Role="Usuario" EntitySet="Usuario" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="ModeloDatosDobble" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
-        <EntityContainer Name="ModeloDatosDobbleContainer" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Cuenta_Usuario" EntityType="ModeloDatosDobble.Cuenta_Usuario" />
-          <EntitySet Name="Estado_SolicitudAmistad" EntityType="ModeloDatosDobble.Estado_SolicitudAmistad" />
-          <EntitySet Name="Relaciones_Amistad" EntityType="ModeloDatosDobble.Relaciones_Amistad" />
-          <EntitySet Name="Usuario" EntityType="ModeloDatosDobble.Usuario" />
-          <AssociationSet Name="FK_CuentaUsuario_Usuario" Association="ModeloDatosDobble.FK_CuentaUsuario_Usuario">
-            <End Role="Usuario" EntitySet="Usuario" />
-            <End Role="Cuenta_Usuario" EntitySet="Cuenta_Usuario" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Estado_SolicitudAmistad_idEstado_SolicitudAmistad" Association="ModeloDatosDobble.FK_Estado_SolicitudAmistad_idEstado_SolicitudAmistad">
-            <End Role="Estado_SolicitudAmistad" EntitySet="Estado_SolicitudAmistad" />
-            <End Role="Relaciones_Amistad" EntitySet="Relaciones_Amistad" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Relaciones_Amistad_Usuario" Association="ModeloDatosDobble.FK_Relaciones_Amistad_Usuario">
-            <End Role="Usuario" EntitySet="Usuario" />
-            <End Role="Relaciones_Amistad" EntitySet="Relaciones_Amistad" />
-          </AssociationSet>
-        </EntityContainer>
-        <EntityType Name="Cuenta_Usuario">
+      <Schema Namespace="DobbleBDModelo" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Amistad">
           <Key>
-            <PropertyRef Name="idCuenta_Usuario" />
+            <PropertyRef Name="idAmistad" />
           </Key>
-          <Property Name="idCuenta_Usuario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="usuario" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
-          <Property Name="correo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="contraseña" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="Usuario_idUsuario" Type="Int32" />
-          <NavigationProperty Name="Usuario1" Relationship="ModeloDatosDobble.FK_CuentaUsuario_Usuario" FromRole="Cuenta_Usuario" ToRole="Usuario" />
+          <Property Name="idAmistad" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EstadoAmistadId" Type="Int32" Nullable="false" />
+          <Property Name="UsuarioPrincipalId" Type="Int32" Nullable="false" />
+          <Property Name="UsuarioAmigoId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="EstadoAmistad" Relationship="Self.FK_Amistad_EstadoAmistad" FromRole="Amistad" ToRole="EstadoAmistad" />
+          <NavigationProperty Name="Usuario" Relationship="Self.FK_Amistad_UsuarioAmigo" FromRole="Amistad" ToRole="Usuario" />
+          <NavigationProperty Name="Usuario1" Relationship="Self.FK_Amistad_UsuarioPrincipal" FromRole="Amistad" ToRole="Usuario" />
         </EntityType>
-        <EntityType Name="Estado_SolicitudAmistad">
+        <EntityType Name="Cuenta">
           <Key>
-            <PropertyRef Name="idEstado_SolicitudAmistad" />
+            <PropertyRef Name="idCuenta" />
           </Key>
-          <Property Name="idEstado_SolicitudAmistad" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="estado" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Relaciones_Amistad" Relationship="ModeloDatosDobble.FK_Estado_SolicitudAmistad_idEstado_SolicitudAmistad" FromRole="Estado_SolicitudAmistad" ToRole="Relaciones_Amistad" />
+          <Property Name="idCuenta" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombreUsuario" Type="String" MaxLength="15" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="correo" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="contraseña" Type="String" MaxLength="40" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Usuario" Relationship="Self.FK_Usuario_Cuenta" FromRole="Cuenta" ToRole="Usuario" />
         </EntityType>
-        <EntityType Name="Relaciones_Amistad">
+        <EntityType Name="EstadoAmistad">
           <Key>
-            <PropertyRef Name="idAmigo" />
+            <PropertyRef Name="idEstadoAmistad" />
           </Key>
-          <Property Name="idAmigo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Usuario_idUsuario" Type="Int32" />
-          <Property Name="Estado_SolicitudAmistad_idEstado_SolicitudAmistad" Type="Int32" />
-          <NavigationProperty Name="Estado_SolicitudAmistad" Relationship="ModeloDatosDobble.FK_Estado_SolicitudAmistad_idEstado_SolicitudAmistad" FromRole="Relaciones_Amistad" ToRole="Estado_SolicitudAmistad" />
-          <NavigationProperty Name="Usuario" Relationship="ModeloDatosDobble.FK_Relaciones_Amistad_Usuario" FromRole="Relaciones_Amistad" ToRole="Usuario" />
+          <Property Name="idEstadoAmistad" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="estado" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Amistad" Relationship="Self.FK_Amistad_EstadoAmistad" FromRole="EstadoAmistad" ToRole="Amistad" />
         </EntityType>
         <EntityType Name="Usuario">
           <Key>
             <PropertyRef Name="idUsuario" />
           </Key>
-          <Property Name="idUsuario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="idUsuario" Type="Int32" Nullable="false" />
           <Property Name="foto" Type="Binary" MaxLength="Max" FixedLength="false" />
           <Property Name="puntaje" Type="Int32" />
-          <NavigationProperty Name="Cuenta_Usuario" Relationship="ModeloDatosDobble.FK_CuentaUsuario_Usuario" FromRole="Usuario" ToRole="Cuenta_Usuario" />
-          <NavigationProperty Name="Relaciones_Amistad" Relationship="ModeloDatosDobble.FK_Relaciones_Amistad_Usuario" FromRole="Usuario" ToRole="Relaciones_Amistad" />
+          <NavigationProperty Name="Amistad" Relationship="Self.FK_Amistad_UsuarioAmigo" FromRole="Usuario" ToRole="Amistad" />
+          <NavigationProperty Name="Amistad1" Relationship="Self.FK_Amistad_UsuarioPrincipal" FromRole="Usuario" ToRole="Amistad" />
+          <NavigationProperty Name="Cuenta" Relationship="Self.FK_Usuario_Cuenta" FromRole="Usuario" ToRole="Cuenta" />
         </EntityType>
-        <Association Name="FK_CuentaUsuario_Usuario">
-          <End Type="ModeloDatosDobble.Usuario" Role="Usuario" Multiplicity="0..1">
+        <Association Name="FK_Amistad_EstadoAmistad">
+          <End Role="EstadoAmistad" Type="Self.EstadoAmistad" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="ModeloDatosDobble.Cuenta_Usuario" Role="Cuenta_Usuario" Multiplicity="*" />
+          <End Role="Amistad" Type="Self.Amistad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EstadoAmistad">
+              <PropertyRef Name="idEstadoAmistad" />
+            </Principal>
+            <Dependent Role="Amistad">
+              <PropertyRef Name="EstadoAmistadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Amistad_UsuarioAmigo">
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="1" />
+          <End Role="Amistad" Type="Self.Amistad" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Usuario">
               <PropertyRef Name="idUsuario" />
             </Principal>
-            <Dependent Role="Cuenta_Usuario">
-              <PropertyRef Name="Usuario_idUsuario" />
+            <Dependent Role="Amistad">
+              <PropertyRef Name="UsuarioAmigoId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Estado_SolicitudAmistad_idEstado_SolicitudAmistad">
-          <End Type="ModeloDatosDobble.Estado_SolicitudAmistad" Role="Estado_SolicitudAmistad" Multiplicity="0..1" />
-          <End Type="ModeloDatosDobble.Relaciones_Amistad" Role="Relaciones_Amistad" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Estado_SolicitudAmistad">
-              <PropertyRef Name="idEstado_SolicitudAmistad" />
-            </Principal>
-            <Dependent Role="Relaciones_Amistad">
-              <PropertyRef Name="Estado_SolicitudAmistad_idEstado_SolicitudAmistad" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Relaciones_Amistad_Usuario">
-          <End Type="ModeloDatosDobble.Usuario" Role="Usuario" Multiplicity="0..1" />
-          <End Type="ModeloDatosDobble.Relaciones_Amistad" Role="Relaciones_Amistad" Multiplicity="*" />
+        <Association Name="FK_Amistad_UsuarioPrincipal">
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Amistad" Type="Self.Amistad" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Usuario">
               <PropertyRef Name="idUsuario" />
             </Principal>
-            <Dependent Role="Relaciones_Amistad">
-              <PropertyRef Name="Usuario_idUsuario" />
+            <Dependent Role="Amistad">
+              <PropertyRef Name="UsuarioPrincipalId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Usuario_Cuenta">
+          <End Role="Cuenta" Type="Self.Cuenta" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="1" />
+          <ReferentialConstraint>
+            <Principal Role="Cuenta">
+              <PropertyRef Name="idCuenta" />
+            </Principal>
+            <Dependent Role="Usuario">
+              <PropertyRef Name="idUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DobbleBDEntidades" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Amistad" EntityType="Self.Amistad" />
+          <EntitySet Name="Cuenta" EntityType="Self.Cuenta" />
+          <EntitySet Name="EstadoAmistad" EntityType="Self.EstadoAmistad" />
+          <EntitySet Name="Usuario" EntityType="Self.Usuario" />
+          <AssociationSet Name="FK_Amistad_EstadoAmistad" Association="Self.FK_Amistad_EstadoAmistad">
+            <End Role="EstadoAmistad" EntitySet="EstadoAmistad" />
+            <End Role="Amistad" EntitySet="Amistad" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Amistad_UsuarioAmigo" Association="Self.FK_Amistad_UsuarioAmigo">
+            <End Role="Usuario" EntitySet="Usuario" />
+            <End Role="Amistad" EntitySet="Amistad" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Amistad_UsuarioPrincipal" Association="Self.FK_Amistad_UsuarioPrincipal">
+            <End Role="Usuario" EntitySet="Usuario" />
+            <End Role="Amistad" EntitySet="Amistad" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Usuario_Cuenta" Association="Self.FK_Usuario_Cuenta">
+            <End Role="Cuenta" EntitySet="Cuenta" />
+            <End Role="Usuario" EntitySet="Usuario" />
+          </AssociationSet>
+        </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs" Space="C-S">
-        <Alias Key="Model" Value="ModeloDatosDobble" />
-        <Alias Key="Target" Value="ModeloDatosDobble.Store" />
-        <EntityContainerMapping CdmEntityContainer="ModeloDatosDobbleContainer" StorageEntityContainer="ModeloDatosDobbleStoreContainer">
-          <EntitySetMapping Name="Cuenta_Usuario">
-            <EntityTypeMapping TypeName="ModeloDatosDobble.Cuenta_Usuario">
-              <MappingFragment StoreEntitySet="Cuenta_Usuario">
-                <ScalarProperty Name="Usuario_idUsuario" ColumnName="Usuario_idUsuario" />
-                <ScalarProperty Name="contraseña" ColumnName="contraseña" />
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DobbleBDModeloStoreContainer" CdmEntityContainer="DobbleBDEntidades">
+          <EntitySetMapping Name="Amistad">
+            <EntityTypeMapping TypeName="DobbleBDModelo.Amistad">
+              <MappingFragment StoreEntitySet="Amistad">
+                <ScalarProperty Name="idAmistad" ColumnName="idAmistad" />
+                <ScalarProperty Name="EstadoAmistadId" ColumnName="EstadoAmistadId" />
+                <ScalarProperty Name="UsuarioPrincipalId" ColumnName="UsuarioPrincipalId" />
+                <ScalarProperty Name="UsuarioAmigoId" ColumnName="UsuarioAmigoId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Cuenta">
+            <EntityTypeMapping TypeName="DobbleBDModelo.Cuenta">
+              <MappingFragment StoreEntitySet="Cuenta">
+                <ScalarProperty Name="idCuenta" ColumnName="idCuenta" />
+                <ScalarProperty Name="nombreUsuario" ColumnName="nombreUsuario" />
                 <ScalarProperty Name="correo" ColumnName="correo" />
-                <ScalarProperty Name="usuario" ColumnName="usuario" />
-                <ScalarProperty Name="idCuenta_Usuario" ColumnName="idCuenta_Usuario" />
+                <ScalarProperty Name="contraseña" ColumnName="contraseña" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Estado_SolicitudAmistad">
-            <EntityTypeMapping TypeName="ModeloDatosDobble.Estado_SolicitudAmistad">
-              <MappingFragment StoreEntitySet="Estado_SolicitudAmistad">
+          <EntitySetMapping Name="EstadoAmistad">
+            <EntityTypeMapping TypeName="DobbleBDModelo.EstadoAmistad">
+              <MappingFragment StoreEntitySet="EstadoAmistad">
+                <ScalarProperty Name="idEstadoAmistad" ColumnName="idEstadoAmistad" />
                 <ScalarProperty Name="estado" ColumnName="estado" />
-                <ScalarProperty Name="idEstado_SolicitudAmistad" ColumnName="idEstado_SolicitudAmistad" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Relaciones_Amistad">
-            <EntityTypeMapping TypeName="ModeloDatosDobble.Relaciones_Amistad">
-              <MappingFragment StoreEntitySet="Relaciones_Amistad">
-                <ScalarProperty Name="Estado_SolicitudAmistad_idEstado_SolicitudAmistad" ColumnName="Estado_SolicitudAmistad_idEstado_SolicitudAmistad" />
-                <ScalarProperty Name="Usuario_idUsuario" ColumnName="Usuario_idUsuario" />
-                <ScalarProperty Name="idAmigo" ColumnName="idAmigo" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Usuario">
-            <EntityTypeMapping TypeName="ModeloDatosDobble.Usuario">
+            <EntityTypeMapping TypeName="DobbleBDModelo.Usuario">
               <MappingFragment StoreEntitySet="Usuario">
-                <ScalarProperty Name="puntaje" ColumnName="puntaje" />
-                <ScalarProperty Name="foto" ColumnName="foto" />
                 <ScalarProperty Name="idUsuario" ColumnName="idUsuario" />
+                <ScalarProperty Name="foto" ColumnName="foto" />
+                <ScalarProperty Name="puntaje" ColumnName="puntaje" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -243,23 +284,22 @@
     </edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
-  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
-    <edmx:Connection>
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
       <DesignerInfoPropertySet>
         <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
       </DesignerInfoPropertySet>
-    </edmx:Connection>
-    <edmx:Options>
+    </Connection>
+    <Options>
       <DesignerInfoPropertySet>
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
-        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
-        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
-        <DesignerProperty Name="UseLegacyProvider" Value="False" />
       </DesignerInfoPropertySet>
-    </edmx:Options>
+    </Options>
     <!-- Diagram content (shape and connector positions) -->
-    <edmx:Diagrams>
-    </edmx:Diagrams>
-  </edmx:Designer>
+    <Diagrams></Diagrams>
+  </Designer>
 </edmx:Edmx>

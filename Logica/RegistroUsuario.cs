@@ -12,12 +12,12 @@ namespace Logica
         public static bool RegistrarUsuario(CuentaUsuario cuentaUsuario)
         {
             bool resultado = false;
-            using (var contexto = new ModeloDatosDobbleContainer())
+            using (var contexto = new DobbleBDEntidades())
             {
-                Cuenta_Usuario nuevaCuentaUsuario = new Cuenta_Usuario()
+                Cuenta nuevaCuentaUsuario = new Cuenta()
                 {
-                    idCuenta_Usuario = cuentaUsuario.IdCuentaUsuario,
-                    usuario = cuentaUsuario.Usuario,
+                    idCuenta = cuentaUsuario.IdCuentaUsuario,
+                    nombreUsuario = cuentaUsuario.Usuario,
                     correo = cuentaUsuario.Correo,
                     contraseña = cuentaUsuario.Contraseña,
                 };
@@ -29,7 +29,7 @@ namespace Logica
                     puntaje = cuentaUsuario.Puntaje,
                 };
 
-                contexto.Cuenta_Usuario.Add(nuevaCuentaUsuario);
+                contexto.Cuenta.Add(nuevaCuentaUsuario);
                 contexto.Usuario.Add(usuario);
                 resultado = contexto.SaveChanges() > 0;
             }
@@ -38,10 +38,10 @@ namespace Logica
 
         public static bool ExisteNombreUsuario(string nombreUsuario)
         {
-            using (var contexto = new ModeloDatosDobbleContainer())
+            using (var contexto = new DobbleBDEntidades())
             {
-                return (from cuentaUsuario in contexto.Cuenta_Usuario
-                        where cuentaUsuario.usuario == nombreUsuario
+                return (from cuentaUsuario in contexto.Cuenta
+                        where cuentaUsuario.nombreUsuario == nombreUsuario
                         select cuentaUsuario).Any();
             }
         }

@@ -13,10 +13,10 @@ namespace DataAccess
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class ModeloDatosDobbleContainer : DbContext
+    public partial class DobbleBDEntidades : DbContext
     {
-        public ModeloDatosDobbleContainer()
-            : base("name=ModeloDatosDobbleContainer")
+        public DobbleBDEntidades()
+            : base("name=DobbleBDEntidades")
         {
         }
     
@@ -25,9 +25,9 @@ namespace DataAccess
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Cuenta_Usuario> Cuenta_Usuario { get; set; }
-        public virtual DbSet<Estado_SolicitudAmistad> Estado_SolicitudAmistad { get; set; }
-        public virtual DbSet<Relaciones_Amistad> Relaciones_Amistad { get; set; }
+        public virtual DbSet<Amistad> Amistad { get; set; }
+        public virtual DbSet<Cuenta> Cuenta { get; set; }
+        public virtual DbSet<EstadoAmistad> EstadoAmistad { get; set; }
         public virtual DbSet<Usuario> Usuario { get; set; }
     }
 }

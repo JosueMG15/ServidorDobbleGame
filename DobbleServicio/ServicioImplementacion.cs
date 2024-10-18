@@ -32,11 +32,11 @@ namespace DobbleServicio
 
         public bool ExisteNombreUsuario(string nombreUsuario)
         {
-            bool existeNombre = false;
+            bool existeNombre = true;
             try
             {
                 RegistroUsuario.ExisteNombreUsuario(nombreUsuario);
-                existeNombre = true;
+                existeNombre = false;
             }
             catch (EntityException e)
             {

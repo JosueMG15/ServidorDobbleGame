@@ -12,14 +12,15 @@ namespace DataAccess
     using System;
     using System.Collections.Generic;
     
-    public partial class Cuenta_Usuario
+    public partial class Amistad
     {
-        public int idCuenta_Usuario { get; set; }
-        public string usuario { get; set; }
-        public string correo { get; set; }
-        public string contraseña { get; set; }
-        public Nullable<int> Usuario_idUsuario { get; set; }
+        public int idAmistad { get; set; }
+        public int EstadoAmistadId { get; set; }
+        public int UsuarioPrincipalId { get; set; }
+        public int UsuarioAmigoId { get; set; }
     
+        public virtual EstadoAmistad EstadoAmistad { get; set; }
+        public virtual Usuario Usuario { get; set; }
         public virtual Usuario Usuario1 { get; set; }
     }
 }

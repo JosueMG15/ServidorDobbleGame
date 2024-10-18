@@ -12,13 +12,18 @@ namespace DataAccess
     using System;
     using System.Collections.Generic;
     
-    public partial class Relaciones_Amistad
+    public partial class EstadoAmistad
     {
-        public int idAmigo { get; set; }
-        public Nullable<int> Usuario_idUsuario { get; set; }
-        public Nullable<int> Estado_SolicitudAmistad_idEstado_SolicitudAmistad { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public EstadoAmistad()
+        {
+            this.Amistad = new HashSet<Amistad>();
+        }
     
-        public virtual Estado_SolicitudAmistad Estado_SolicitudAmistad { get; set; }
-        public virtual Usuario Usuario { get; set; }
+        public int idEstadoAmistad { get; set; }
+        public string estado { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Amistad> Amistad { get; set; }
     }
 }

@@ -17,8 +17,8 @@ namespace DataAccess
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Usuario()
         {
-            this.Cuenta_Usuario = new HashSet<Cuenta_Usuario>();
-            this.Relaciones_Amistad = new HashSet<Relaciones_Amistad>();
+            this.Amistad = new HashSet<Amistad>();
+            this.Amistad1 = new HashSet<Amistad>();
         }
     
         public int idUsuario { get; set; }
@@ -26,8 +26,9 @@ namespace DataAccess
         public Nullable<int> puntaje { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Cuenta_Usuario> Cuenta_Usuario { get; set; }
+        public virtual ICollection<Amistad> Amistad { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Relaciones_Amistad> Relaciones_Amistad { get; set; }
+        public virtual ICollection<Amistad> Amistad1 { get; set; }
+        public virtual Cuenta Cuenta { get; set; }
     }
 }
