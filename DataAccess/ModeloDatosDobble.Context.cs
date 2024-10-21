@@ -27,7 +27,6 @@ namespace DataAccess
     
         public virtual DbSet<Amistad> Amistad { get; set; }
         public virtual DbSet<Cuenta> Cuenta { get; set; }
-        public virtual DbSet<EstadoAmistad> EstadoAmistad { get; set; }
         public virtual DbSet<Usuario> Usuario { get; set; }
     }
 }

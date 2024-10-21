@@ -24,9 +24,10 @@ namespace Logica
 
                 Usuario usuario = new Usuario()
                 {
-                    idUsuario = cuentaUsuario.IdCuentaUsuario,
+                    idCuenta = cuentaUsuario.IdCuentaUsuario,
                     foto = cuentaUsuario.Foto,
                     puntaje = cuentaUsuario.Puntaje,
+                    estado = cuentaUsuario.Estado,
                 };
 
                 contexto.Cuenta.Add(nuevaCuentaUsuario);
@@ -64,8 +65,8 @@ namespace Logica
             {
                 cuentaUsuario = (from cuenta in contexto.Cuenta
                                  join usuario in contexto.Usuario
-                                 on cuenta.Usuario.idUsuario 
-                                 equals usuario.idUsuario
+                                 on cuenta.Usuario.idCuenta 
+                                 equals usuario.idCuenta
                                  where cuenta.nombreUsuario == nombreUsuario
                                  && cuenta.contraseña == contraseña
                                  select new CuentaUsuario

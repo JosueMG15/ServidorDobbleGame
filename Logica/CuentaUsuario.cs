@@ -24,6 +24,8 @@ namespace Logica
         public byte[] Foto { get; set; }
         [DataMember]
         public int Puntaje { get; set; }
+        [DataMember]
+        public bool Estado {  get; set; }
         
     }
 }

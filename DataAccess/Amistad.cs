@@ -15,11 +15,10 @@ namespace DataAccess
     public partial class Amistad
     {
         public int idAmistad { get; set; }
-        public int EstadoAmistadId { get; set; }
+        public Nullable<bool> estadoSolicitud { get; set; }
         public int UsuarioPrincipalId { get; set; }
         public int UsuarioAmigoId { get; set; }
     
-        public virtual EstadoAmistad EstadoAmistad { get; set; }
         public virtual Usuario Usuario { get; set; }
         public virtual Usuario Usuario1 { get; set; }
     }

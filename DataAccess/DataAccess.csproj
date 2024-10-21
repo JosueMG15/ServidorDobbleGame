@@ -59,9 +59,6 @@
     <Compile Include="Cuenta.cs">
       <DependentUpon>ModeloDatosDobble.tt</DependentUpon>
     </Compile>
-    <Compile Include="EstadoAmistad.cs">
-      <DependentUpon>ModeloDatosDobble.tt</DependentUpon>
-    </Compile>
     <Compile Include="ModeloDatosDobble.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -111,13 +108,13 @@
   <ItemGroup>
     <Content Include="ModeloDatosDobble.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>ModeloDatosDobble.edmx</DependentUpon>
       <LastGenOutput>ModeloDatosDobble.Context.cs</LastGenOutput>
+      <DependentUpon>ModeloDatosDobble.edmx</DependentUpon>
     </Content>
     <Content Include="ModeloDatosDobble.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>ModeloDatosDobble.edmx</DependentUpon>
       <LastGenOutput>ModeloDatosDobble.cs</LastGenOutput>
+      <DependentUpon>ModeloDatosDobble.edmx</DependentUpon>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

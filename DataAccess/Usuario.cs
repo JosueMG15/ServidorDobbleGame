@@ -21,9 +21,10 @@ namespace DataAccess
             this.Amistad1 = new HashSet<Amistad>();
         }
     
-        public int idUsuario { get; set; }
+        public int idCuenta { get; set; }
         public byte[] foto { get; set; }
         public Nullable<int> puntaje { get; set; }
+        public Nullable<bool> estado { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Amistad> Amistad { get; set; }
