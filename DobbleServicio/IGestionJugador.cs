@@ -20,6 +20,9 @@ namespace DobbleServicio
         [OperationContract]
         CuentaUsuario IniciarSesionJugador(string nombreUsuario, string contraseña);
 
+        //[OperationContract]
+        //bool ModificarNombreUsuario(String nombreUsuario);
+
     }
     
 }

@@ -85,7 +85,13 @@ namespace DobbleServicio
 
             return cuentaUsuario;
         }
+
+        /*public bool ModificarNombreUsuario(String nombreUusario)
+        {
+            
+        }*/
     }
+
 
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public partial class ServicioImplementacion : IGestionSala
