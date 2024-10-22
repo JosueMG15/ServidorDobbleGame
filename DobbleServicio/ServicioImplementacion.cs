@@ -86,10 +86,43 @@ namespace DobbleServicio
             return cuentaUsuario;
         }
 
-        /*public bool ModificarNombreUsuario(String nombreUusario)
+        public bool ModificarNombreUsuario(int idUsuario, String nombreUsuario)
         {
-            
-        }*/
+            bool resultado = false;
+            try
+            {
+                ModificarUsuario.ModificarNombreUsuario(idUsuario, nombreUsuario);
+                resultado = true;
+            }
+            catch (EntityException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return resultado;
+        }
+
+        public bool ModificarContraseñaUsuario(int idUsuario, String contraseñaUsuario)
+        {
+            bool resultado = false;
+            try
+            {
+                ModificarUsuario.ModificarContraseñaUsuario(idUsuario, contraseñaUsuario);
+                resultado = true;
+            }
+            catch (EntityException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return resultado;
+        }
     }
 
 

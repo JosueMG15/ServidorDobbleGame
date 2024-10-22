@@ -13,15 +13,21 @@ namespace DobbleServicio
     {
         [OperationContract]
         bool RegistrarUsuario(CuentaUsuario cuentaUsuario);
+
         [OperationContract]
         bool ExisteNombreUsuario(string nombreUsuario);
+
         [OperationContract]
         bool ExisteCorreoAsociado(string correoUsuario);
+
         [OperationContract]
         CuentaUsuario IniciarSesionJugador(string nombreUsuario, string contraseña);
 
-        //[OperationContract]
-        //bool ModificarNombreUsuario(String nombreUsuario);
+        [OperationContract]
+        bool ModificarNombreUsuario(int idCuenta, String nombreUsuario);
+
+        [OperationContract]
+        bool ModificarContraseñaUsuario(int idCuenta, String contraseñaUsuario);
 
     }
     
