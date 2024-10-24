@@ -1,4 +1,5 @@
-﻿using Logica;
+﻿using DataAccess;
+using Logica;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -112,6 +113,45 @@ namespace DobbleServicio
             {
                 ModificarUsuario.ModificarContraseñaUsuario(idUsuario, contraseñaUsuario);
                 resultado = true;
+            }
+            catch (EntityException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return resultado;
+        }
+
+        public bool ModificarFotoUsuario(int idCuenta, byte[] fotoUsuario)
+        {
+            bool resultado = false;
+            try
+            {
+                ModificarUsuario.ModificarFotoUsuario(idCuenta, fotoUsuario);
+                resultado = true;
+            }
+            catch (EntityException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return resultado;
+        }
+
+        public bool ValidarContraseña(int idUsuario, String contraseñaIngresada)
+        {
+            bool resultado = false;
+            try
+            {
+                ModificarUsuario.ValidarContraseña(idUsuario, contraseñaIngresada);
+                bool resultadoValidacion = ModificarUsuario.ValidarContraseña(idUsuario, contraseñaIngresada);
+                return resultadoValidacion;
             }
             catch (EntityException e)
             {
