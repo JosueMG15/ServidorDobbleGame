@@ -21,7 +21,7 @@
           <Property Name="idCuenta" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="nombreUsuario" Type="varchar" MaxLength="15" Nullable="false" />
           <Property Name="correo" Type="varchar" MaxLength="60" Nullable="false" />
-          <Property Name="contraseña" Type="varchar" MaxLength="35" Nullable="false" />
+          <Property Name="contraseña" Type="varchar" MaxLength="255" Nullable="false" />
         </EntityType>
         <EntityType Name="Usuario">
           <Key>
@@ -128,7 +128,7 @@
           <Property Name="idCuenta" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="nombreUsuario" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
           <Property Name="correo" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="false" />
-          <Property Name="contraseña" Type="String" Nullable="false" MaxLength="35" FixedLength="false" Unicode="false" />
+          <Property Name="contraseña" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Usuario" Relationship="ModeloDatosDobble.FK__Usuario__idCuent__3D5E1FD2" FromRole="Cuenta" ToRole="Usuario" />
         </EntityType>
         <EntityType Name="Usuario">

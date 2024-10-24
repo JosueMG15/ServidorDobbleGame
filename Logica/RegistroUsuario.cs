@@ -12,28 +12,43 @@ namespace Logica
         public static bool RegistrarUsuario(CuentaUsuario cuentaUsuario)
         {
             bool resultado = false;
-            using (var contexto = new DobbleBDEntidades())
+
+            try
             {
-                Cuenta nuevaCuentaUsuario = new Cuenta()
+                using (var contexto = new DobbleBDEntidades())
                 {
-                    idCuenta = cuentaUsuario.IdCuentaUsuario,
-                    nombreUsuario = cuentaUsuario.Usuario,
-                    correo = cuentaUsuario.Correo,
-                    contraseña = cuentaUsuario.Contraseña,
-                };
+                    Cuenta nuevaCuentaUsuario = new Cuenta()
+                    {
+                        idCuenta = cuentaUsuario.IdCuentaUsuario,
+                        nombreUsuario = cuentaUsuario.Usuario,
+                        correo = cuentaUsuario.Correo,
+                        contraseña = cuentaUsuario.Contraseña,
+                    };
 
-                Usuario usuario = new Usuario()
-                {
-                    idCuenta = cuentaUsuario.IdCuentaUsuario,
-                    foto = cuentaUsuario.Foto,
-                    puntaje = cuentaUsuario.Puntaje,
-                    estado = cuentaUsuario.Estado,
-                };
+                    Usuario usuario = new Usuario()
+                    {
+                        idCuenta = cuentaUsuario.IdCuentaUsuario,
+                        foto = cuentaUsuario.Foto,
+                        puntaje = cuentaUsuario.Puntaje,
+                        estado = cuentaUsuario.Estado,
+                    };
 
-                contexto.Cuenta.Add(nuevaCuentaUsuario);
-                contexto.Usuario.Add(usuario);
-                resultado = contexto.SaveChanges() > 0;
+                    contexto.Cuenta.Add(nuevaCuentaUsuario);
+                    contexto.Usuario.Add(usuario);
+                    resultado = contexto.SaveChanges() > 0;
+                }
             }
+            catch (System.Data.Entity.Validation.DbEntityValidationException ex)
+            {
+                foreach (var validationErrors in ex.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        Console.WriteLine($"Propiedad: {validationError.PropertyName} - Error: {validationError.ErrorMessage}");
+                    }
+                }
+            }
+
             return resultado;
         }
 
@@ -57,7 +72,7 @@ namespace Logica
             }
         }
 
-        //podría estar en otra clase
+        //Podría estar en otra clase
         public static CuentaUsuario IniciarSesion(string nombreUsuario, string contraseña)
         {
             CuentaUsuario cuentaUsuario = null;

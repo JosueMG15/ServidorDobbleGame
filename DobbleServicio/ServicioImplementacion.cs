@@ -16,8 +16,7 @@ namespace DobbleServicio
             bool resultado = false;
             try
             {
-                RegistroUsuario.RegistrarUsuario(cuentaUsuario);
-                resultado = true;
+                return RegistroUsuario.RegistrarUsuario(cuentaUsuario);
             }
             catch (EntityException e)
             {
@@ -72,7 +71,7 @@ namespace DobbleServicio
 
             try
             {
-                cuentaUsuario = IniciarSesionJugador(nombreUsuario, contraseña);
+                cuentaUsuario = RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
             }
             catch (EntityException e)
             {
