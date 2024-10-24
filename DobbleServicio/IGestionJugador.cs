@@ -29,6 +29,10 @@ namespace DobbleServicio
         [OperationContract]
         bool ModificarContraseñaUsuario(int idCuenta, String contraseñaUsuario);
 
-    }
-    
+        [OperationContract]
+        bool ModificarFotoUsuario(int idCuenta, byte[] fotoUsuario);
+
+        [OperationContract]
+        bool ValidarContraseña(int idCuenta, String contraseñaUsuario);
+    }   
 }

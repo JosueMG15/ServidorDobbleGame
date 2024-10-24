@@ -40,5 +40,39 @@ namespace Logica
                 return resultado;
             }
         }
+
+        public static bool ModificarFotoUsuario(int idCuenta, byte[] fotoUsuario)
+        {
+            bool resultado = false;
+            using (var contexto = new DobbleBDEntidades())
+            {
+                var usuario = contexto.Usuario.FirstOrDefault(c => c.idCuenta == idCuenta);
+
+                if (usuario != null)
+                {
+                    usuario.foto = fotoUsuario;
+                    resultado = contexto.SaveChanges() > 0;
+                }
+                return resultado;
+            }
+        }
+
+        public static bool ValidarContraseña(int idCuenta, String contraseñaIngresada)
+        {
+            bool resultado = false;
+            using (var contexto = new DobbleBDEntidades())
+            {
+                var cuentaUsuario = contexto.Cuenta.FirstOrDefault(c => c.idCuenta == idCuenta);
+
+                if (cuentaUsuario != null)
+                {
+                    string contraseñaAlmacenada = cuentaUsuario.contraseña;
+
+                    resultado = contraseñaIngresada == contraseñaAlmacenada;
+                    
+                }
+            }
+            return resultado;
+        }
     }
 }
