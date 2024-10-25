@@ -16,7 +16,6 @@ namespace Pruebas
             // Arrange
             var cuentaUsuario = new CuentaUsuario
             {
-                IdCuentaUsuario = 1,
                 Usuario = "UsuarioPrueba",
                 Correo = "correo@hotmail.com",
                 Contraseña = "Dobble1234",
@@ -38,7 +37,6 @@ namespace Pruebas
             // Arrange
             var cuentaUsuario = new CuentaUsuario
             {
-                IdCuentaUsuario = 1,
                 Usuario = "usuario1",
                 Correo = "",
                 Contraseña = "1234",

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Logica;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -11,14 +12,24 @@ namespace DobbleServicio
     [ServiceContract(CallbackContract = typeof(ISalaCallback))]
     public interface IGestionSala
     {
+        [OperationContract]
+        bool CrearNuevaSala(string nombreAnfitrion, string codigoSala);
+        [OperationContract]
+        void UnirseASala(string nombreUsuario, string codigoSala, string mensaje);
         [OperationContract(IsOneWay = true)]
-        void EnviarMensajeSala(String mensaje);
+        void AbandonarSala(string nombreUsuario, string codigoSala, string mensaje);
+
+        [OperationContract(IsOneWay = true)]
+        void EnviarMensajeSala(string nombreUsuario, string codigoSala, string mensaje);
+        [OperationContract]
+        string GenerarCodigoNuevaSala();
+ 
     }
 
     [ServiceContract]
     interface ISalaCallback
     {
         [OperationContract(IsOneWay = true)]
-        void SalaResponse(String respuesta);
+        void MostrarMensajeSala(string mensaje);
     }
 }

@@ -10,13 +10,14 @@ namespace Logica
     [DataContract]
     public class Sala
     {
-        public const int CantidadMaximaJugadores = 4;
-        public const int CantidadMinimaJugadoresParaIniciarPartida = 2;
+        public const int MaximoJugadores = 4;
+        public const int MinimoJugadoresParaIniciarPartida = 2;
+        [DataMember]
+        public List<CuentaUsuario> CuentasUsuarios;
         [DataMember]
         public string CodigoSala {  get; set; }
         [DataMember]
         public string NombreAnfitrion {  get; set; }
-        [DataMember]
-        public int ContadorJugadores { get; set; }
+
     }
 }

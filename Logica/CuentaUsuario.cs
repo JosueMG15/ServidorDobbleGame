@@ -26,6 +26,7 @@ namespace Logica
         public int Puntaje { get; set; }
         [DataMember]
         public bool Estado {  get; set; }
+        public OperationContext ContextoOperacion { get; set; }
         
     }
 }
