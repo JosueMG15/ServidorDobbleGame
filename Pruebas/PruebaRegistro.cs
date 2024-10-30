@@ -11,45 +11,14 @@ namespace Pruebas
     public class PruebaRegistro
     {
         [TestMethod]
-        public void RegistrarUsuarioPruebaExitoso()
+        public void ExisteCorreoAsociado_DevuelveVerdadero()
         {
-            // Arrange
-            var cuentaUsuario = new CuentaUsuario
-            {
-                Usuario = "UsuarioPrueba",
-                Correo = "correo@hotmail.com",
-                Contraseña = "Dobble1234",
-                Foto = null,
-                Puntaje = 0,
-                Estado = true
-            };
-
-            // Act
-            var resultado = RegistroUsuario.RegistrarUsuario(cuentaUsuario); 
-
-            // Assert
-            Assert.IsTrue(resultado);
+            Assert.IsTrue(RegistroUsuario.ExisteCorreoAsociado("correoprueba@hotmail.com"));
         }
-
         [TestMethod]
-        public void RegistrarUsuarioPruebaNoExitoso()
+        public void ExisteCorreoAsociado_DevuelveFalso()
         {
-            // Arrange
-            var cuentaUsuario = new CuentaUsuario
-            {
-                Usuario = "usuario1",
-                Correo = "",
-                Contraseña = "1234",
-                Foto = null,
-                Puntaje = 0,
-                Estado = false
-            };
-
-            // Act
-            var resultado = RegistroUsuario.RegistrarUsuario(cuentaUsuario);
-
-            // Assert
-            Assert.IsFalse(resultado);
+            Assert.IsFalse(RegistroUsuario.ExisteCorreoAsociado("noexiste@hotmail.com"));
         }
     }
 }

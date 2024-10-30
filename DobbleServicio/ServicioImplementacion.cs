@@ -1,5 +1,4 @@
-﻿using DataAccess;
-using Logica;
+﻿using Logica;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,155 +11,68 @@ namespace DobbleServicio
 {
     public partial class ServicioImplementacion : IGestionJugador
     {
-        public bool RegistrarUsuario(CuentaUsuario cuentaUsuario)
+        public RespuestaServicio<bool> RegistrarUsuario(CuentaUsuario cuentaUsuario)
         {
-            bool resultado = false;
-            try
+            return GestorErrores.Ejecutar(() =>
             {
                 return RegistroUsuario.RegistrarUsuario(cuentaUsuario);
-            }
-            catch (EntityException e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            return resultado;
+            });
         }
 
-        public bool ExisteNombreUsuario(string nombreUsuario)
+        public RespuestaServicio<bool> ExisteNombreUsuario(string nombreUsuario)
         {
-            bool existeNombre = true;
-            try
+            return GestorErrores.Ejecutar(() =>
             {
-                existeNombre = RegistroUsuario.ExisteNombreUsuario(nombreUsuario); 
-            }
-            catch (EntityException e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            return existeNombre;
+                return RegistroUsuario.ExisteNombreUsuario(nombreUsuario);
+            });
         }
 
-        public bool ExisteCorreoAsociado(string correo)
+        public RespuestaServicio<bool> ExisteCorreoAsociado(string correo)
         {
-            bool existeCorreo = true;
-            try
+            return GestorErrores.Ejecutar(() =>
             {
-                existeCorreo = RegistroUsuario.ExisteCorreoAsociado(correo);
-            }
-            catch (EntityException e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            return existeCorreo;
+                return RegistroUsuario.ExisteCorreoAsociado(correo);
+            });
         }
 
-        public CuentaUsuario IniciarSesionJugador(string nombreUsuario, string contraseña)
+        public RespuestaServicio<CuentaUsuario> IniciarSesionJugador(string nombreUsuario, string contraseña)
         {
-            CuentaUsuario cuentaUsuario = null;
-
-            try
+            return GestorErrores.Ejecutar(() =>
             {
-                cuentaUsuario = RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
-            }
-            catch (EntityException e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-
-            return cuentaUsuario;
+                return RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
+            });
         }
 
-        public bool ModificarNombreUsuario(int idUsuario, String nombreUsuario)
+        public RespuestaServicio<bool> ModificarNombreUsuario(int idUsuario, String nombreUsuario)
         {
-            bool resultado = false;
-            try
+            return GestorErrores.Ejecutar(() =>
             {
-                ModificarUsuario.ModificarNombreUsuario(idUsuario, nombreUsuario);
-                resultado = true;
-            }
-            catch (EntityException e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            return resultado;
+                return ModificarUsuario.ModificarNombreUsuario(idUsuario, nombreUsuario);
+            });
         }
 
-        public bool ModificarContraseñaUsuario(int idUsuario, String contraseñaUsuario)
+        public RespuestaServicio<bool> ModificarContraseñaUsuario(int idUsuario, String contraseñaUsuario)
         {
-            bool resultado = false;
-            try
+            return GestorErrores.Ejecutar(() =>
             {
-                ModificarUsuario.ModificarContraseñaUsuario(idUsuario, contraseñaUsuario);
-                resultado = true;
-            }
-            catch (EntityException e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            return resultado;
+                return ModificarUsuario.ModificarContraseñaUsuario(idUsuario, contraseñaUsuario);
+            });
         }
 
-        public bool ModificarFotoUsuario(int idCuenta, byte[] fotoUsuario)
+        public RespuestaServicio<bool> ModificarFotoUsuario(int idCuenta, byte[] fotoUsuario)
         {
-            bool resultado = false;
-            try
+            return GestorErrores.Ejecutar(() =>
             {
-                ModificarUsuario.ModificarFotoUsuario(idCuenta, fotoUsuario);
-                resultado = true;
-            }
-            catch (EntityException e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            return resultado;
+                return ModificarUsuario.ModificarFotoUsuario(idCuenta, fotoUsuario);
+            });
         }
 
-        public bool ValidarContraseña(int idUsuario, String contraseñaIngresada)
+        public RespuestaServicio<bool> ValidarContraseña(int idUsuario, String contraseñaIngresada)
         {
-            bool resultado = false;
-            try
+            return GestorErrores.Ejecutar(() =>
             {
-                ModificarUsuario.ValidarContraseña(idUsuario, contraseñaIngresada);
-                bool resultadoValidacion = ModificarUsuario.ValidarContraseña(idUsuario, contraseñaIngresada);
-                return resultadoValidacion;
-            }
-            catch (EntityException e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            return resultado;
+                return ModificarUsuario.ValidarContraseña(idUsuario, contraseñaIngresada);
+            });
         }
     }
 

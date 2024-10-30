@@ -12,27 +12,27 @@ namespace DobbleServicio
     public interface IGestionJugador
     {
         [OperationContract]
-        bool RegistrarUsuario(CuentaUsuario cuentaUsuario);
+        RespuestaServicio<bool> RegistrarUsuario(CuentaUsuario cuentaUsuario);
 
         [OperationContract]
-        bool ExisteNombreUsuario(string nombreUsuario);
+        RespuestaServicio<bool> ExisteNombreUsuario(string nombreUsuario);
 
         [OperationContract]
-        bool ExisteCorreoAsociado(string correoUsuario);
+        RespuestaServicio<bool> ExisteCorreoAsociado(string correoUsuario);
 
         [OperationContract]
-        CuentaUsuario IniciarSesionJugador(string nombreUsuario, string contraseña);
+        RespuestaServicio<CuentaUsuario> IniciarSesionJugador(string nombreUsuario, string contraseña);
 
         [OperationContract]
-        bool ModificarNombreUsuario(int idCuenta, String nombreUsuario);
+        RespuestaServicio<bool> ModificarNombreUsuario(int idCuenta, String nombreUsuario);
 
         [OperationContract]
-        bool ModificarContraseñaUsuario(int idCuenta, String contraseñaUsuario);
+        RespuestaServicio<bool> ModificarContraseñaUsuario(int idCuenta, String contraseñaUsuario);
 
         [OperationContract]
-        bool ModificarFotoUsuario(int idCuenta, byte[] fotoUsuario);
+        RespuestaServicio<bool> ModificarFotoUsuario(int idCuenta, byte[] fotoUsuario);
 
         [OperationContract]
-        bool ValidarContraseña(int idCuenta, String contraseñaUsuario);
+        RespuestaServicio<bool> ValidarContraseña(int idCuenta, String contraseñaUsuario);
     }   
 }
