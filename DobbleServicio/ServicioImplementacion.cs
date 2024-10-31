@@ -82,65 +82,81 @@ namespace DobbleServicio
     public partial class ServicioImplementacion : IGestionSala
     {
         private readonly List<Sala> salas = new List<Sala>();
-        private readonly object bloqueoObjeto = new object();
 
-        public void AbandonarSala(string nombreUsuario, string codigoSala, string mensaje)
+        public bool AbandonarSala(string nombreUsuario, string codigoSala, string mensaje)
         {
-            lock (bloqueoObjeto)
+            var sala = salas.FirstOrDefault(s => s.CodigoSala.Equals(codigoSala));
+            if (sala == null) return false;
+
+            try
             {
-                var sala = salas.FirstOrDefault(s => s.CodigoSala.Equals(codigoSala));
-                if (sala == null) return;
-
-                CuentaUsuario cuentaUsuario = null;
-                cuentaUsuario = sala.CuentasUsuarios.FirstOrDefault(c => c.Usuario.Equals(nombreUsuario));
-
-                if (cuentaUsuario != null)
+                lock (sala.BloqueoSala)
                 {
+                    CuentaUsuario cuentaUsuario = sala.CuentasUsuarios.FirstOrDefault(c => c.Usuario.Equals(nombreUsuario));
+                    if (cuentaUsuario == null) return false;
+
                     sala.CuentasUsuarios.Remove(cuentaUsuario);
-                    if (sala.CuentasUsuarios.Count() == 0)
+
+                    if (sala.CuentasUsuarios.Count == 0)
                     {
                         salas.Remove(sala);
                     }
                     else
                     {
-                        EnviarMensajeSala(cuentaUsuario.Usuario, codigoSala, $"{cuentaUsuario.Usuario} {mensaje}");
+                        EnviarMensajeConexionSala(nombreUsuario, codigoSala, mensaje);
                     }
+
+                    return true;
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
             }
         }
 
         public bool CrearNuevaSala(string nombreAnfitrion, string codigoSala)
         {
-            lock (bloqueoObjeto)
+            if (string.IsNullOrEmpty(nombreAnfitrion) || string.IsNullOrEmpty(codigoSala))
             {
-                if (string.IsNullOrEmpty(nombreAnfitrion) || string.IsNullOrEmpty(codigoSala))
-                {
-                    return false;
-                }
+                return false;
+            }
 
-                if (salas.Any(s => s.CodigoSala == codigoSala))
-                {
-                    return false;
-                }
+            if (salas.Any(s => s.CodigoSala == codigoSala))
+            {
+                return false;
+            }
 
-                var nuevaSala = new Sala()
+            var nuevaSala = new Sala()
+            {
+                CodigoSala = codigoSala,
+                NombreAnfitrion = nombreAnfitrion,
+                CuentasUsuarios = new List<CuentaUsuario>()
+            };
+
+            try
+            {
+                lock (nuevaSala.BloqueoSala)
                 {
-                    CodigoSala = codigoSala,
-                    NombreAnfitrion = nombreAnfitrion,
-                    CuentasUsuarios = new List<CuentaUsuario>()
-                };
-                salas.Add(nuevaSala);
-                return true;
+                    salas.Add(nuevaSala);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
             }
         }
 
         public void EnviarMensajeSala(string nombreUsuario, string codigoSala, string mensaje)
         {
-            lock (bloqueoObjeto)
-            {
-                var sala = salas.FirstOrDefault(s => s.CodigoSala.Equals(codigoSala));
-                if (sala == null) return;
+            var sala = salas.FirstOrDefault(s => s.CodigoSala.Equals(codigoSala));
+            if (sala == null) return;
 
+            lock (sala.BloqueoSala)
+            {
                 var usuarioEmisor = sala.CuentasUsuarios.FirstOrDefault(u => u.Usuario.Equals(nombreUsuario));
                 string respuesta = usuarioEmisor != null ? $"{usuarioEmisor.Usuario}: {mensaje}" : string.Empty;
 
@@ -159,14 +175,53 @@ namespace DobbleServicio
                             var callback = usuario.ContextoOperacion.GetCallbackChannel<ISalaCallback>();
                             callback.MostrarMensajeSala(respuesta);
                         }
-                        else
-                        {
-                            Console.WriteLine($"Contexto de operación no disponible para {usuario.Usuario}");
-                        }
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        Console.WriteLine(ex.Message);
                     }
                     catch (Exception ex)
                     {
+                        Console.WriteLine(ex.ToString());
+                    }
+                }
+            }
+        }
+
+        public void EnviarMensajeConexionSala(string nombreUsuario, string codigoSala, string mensaje)
+        {
+            var sala = salas.FirstOrDefault(s => s.CodigoSala.Equals(codigoSala));
+            if (sala == null) return;
+
+            lock (sala.BloqueoSala)
+            {
+                string respuesta = $"{nombreUsuario} {mensaje}";
+
+                foreach (var usuario in  sala.CuentasUsuarios)
+                {
+                    try
+                    {
+                        if (usuario.ContextoOperacion != null)
+                        {
+                            var callback = usuario.ContextoOperacion.GetCallbackChannel<ISalaCallback>();
+                            callback.MostrarMensajeSala(respuesta);
+                        }
+                    }
+                    catch (CommunicationException ex)
+                    {
                         Console.WriteLine(ex.Message);
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
                     }
                 }
             }
@@ -177,26 +232,40 @@ namespace DobbleServicio
             return Guid.NewGuid().ToString();  
         }
 
-        public void UnirseASala(string nombreUsuario, string codigoSala, string mensaje)
+        public bool UnirseASala(string nombreUsuario, int puntaje, byte[] foto, string codigoSala, string mensaje)
         {
-            lock (bloqueoObjeto)
+            bool respuesta = false;
+
+            var sala = salas.FirstOrDefault(s => s.CodigoSala.Equals(codigoSala));
+            if (sala == null) return false;
+
+            CuentaUsuario cuentaUsuario = new CuentaUsuario()
             {
-                var sala = salas.FirstOrDefault(s => s.CodigoSala.Equals(codigoSala));
-                if (sala == null) return;
+                Usuario = nombreUsuario,
+                Puntaje = puntaje,
+                Foto = foto,
+                ContextoOperacion = OperationContext.Current
+            };
 
-                CuentaUsuario cuentaUsuario = new CuentaUsuario()
+            try
+            {
+                lock (sala.BloqueoSala)
                 {
-                    Usuario = nombreUsuario,
-                    ContextoOperacion = OperationContext.Current
-                };
+                    if (sala.CuentasUsuarios.Count > 0)
+                    {
+                        EnviarMensajeConexionSala(nombreUsuario, codigoSala, mensaje);
+                    }
+                    sala.CuentasUsuarios.Add(cuentaUsuario);
 
-                if (sala.CuentasUsuarios.Count > 0)
-                {
-                    EnviarMensajeSala(cuentaUsuario.Usuario, codigoSala, $"{cuentaUsuario.Usuario}{mensaje}");
+                    respuesta = true;
                 }
-
-                sala.CuentasUsuarios.Add(cuentaUsuario);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return respuesta;
         }
     }
 }

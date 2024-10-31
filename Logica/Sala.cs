@@ -12,6 +12,7 @@ namespace Logica
     {
         public const int MaximoJugadores = 4;
         public const int MinimoJugadoresParaIniciarPartida = 2;
+        public readonly object BloqueoSala = new object();
         [DataMember]
         public List<CuentaUsuario> CuentasUsuarios;
         [DataMember]

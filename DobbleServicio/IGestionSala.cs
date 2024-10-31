@@ -15,12 +15,14 @@ namespace DobbleServicio
         [OperationContract]
         bool CrearNuevaSala(string nombreAnfitrion, string codigoSala);
         [OperationContract]
-        void UnirseASala(string nombreUsuario, string codigoSala, string mensaje);
-        [OperationContract(IsOneWay = true)]
-        void AbandonarSala(string nombreUsuario, string codigoSala, string mensaje);
+        bool UnirseASala(string nombreUsuario, int puntaje, byte[] foto, string codigoSala, string mensaje);
+        [OperationContract]
+        bool AbandonarSala(string nombreUsuario, string codigoSala, string mensaje);
 
         [OperationContract(IsOneWay = true)]
         void EnviarMensajeSala(string nombreUsuario, string codigoSala, string mensaje);
+        [OperationContract(IsOneWay = true)]
+        void EnviarMensajeConexionSala(string nombreUsuario, string codigoSala, string mensaje);
         [OperationContract]
         string GenerarCodigoNuevaSala();
  

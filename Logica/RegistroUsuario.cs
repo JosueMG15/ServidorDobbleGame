@@ -78,7 +78,7 @@ namespace Logica
             CuentaUsuario cuentaUsuario = null;
             using (var contexto = new DobbleBDEntidades())
             {
-                cuentaUsuario = (from cuenta in contexto.Cuenta
+                var consulta = (from cuenta in contexto.Cuenta
                                  join usuario in contexto.Usuario
                                  on cuenta.Usuario.idCuenta 
                                  equals usuario.idCuenta
@@ -92,8 +92,11 @@ namespace Logica
                                      Contraseña = cuenta.contraseña,
                                      Foto = usuario.foto,
                                      Puntaje = usuario.puntaje.Value,
-                                 }).FirstOrDefault();
+                                 }).Take(1);
+
+                cuentaUsuario = consulta.FirstOrDefault();
             }
+            
             return cuentaUsuario;
         }
     }
