@@ -372,6 +372,77 @@ namespace DobbleServicio
         }
     }
 
+    public partial class ServicioImplementacion : IGestionAmigos
+    {
+        public RespuestaServicio<bool> EnviarSolicitudAmistad(int idUsuarioPrincipal, String nombreUsuarioAmigo)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                return GestorAmistad.EnviarSolicitudAmistad(idUsuarioPrincipal, nombreUsuarioAmigo);
+            });
+        }
+
+        public RespuestaServicio<bool> AmistadYaExiste(int idUsuarioPrincipal, String nombreUsuarioAmigo)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                return GestorAmistad.AmistadYaExiste(idUsuarioPrincipal, nombreUsuarioAmigo);
+            });
+        }
+
+        public RespuestaServicio<List<Logica.Amistad>> ObtenerSolicitudesPendientes(int idUsuarioAmigo)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                var solicitudesPendientes = GestorAmistad.ObtenerSolicitudesPendientes(idUsuarioAmigo);
+                return solicitudesPendientes;
+            });
+        }
+
+        public RespuestaServicio<CuentaUsuario> ObtenerUsuario(int idUsuario)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                var obtenerUsuario = GestorAmistad.ObtenerUsuario(idUsuario);
+                return obtenerUsuario;
+            });
+        }
+
+        public RespuestaServicio<bool> EliminarAmistad(int idAmistad)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                return GestorAmistad.EliminarAmistad(idAmistad);
+            });
+        }
+
+        public RespuestaServicio<bool> AceptarSolicitud(int idAmistad)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                return GestorAmistad.AceptarSolicitud(idAmistad);
+            });
+        }
+
+        public RespuestaServicio<List<Logica.Amistad>> ObtenerAmistades(int idUsuario)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                var amistades = GestorAmistad.ObtenerAmistades(idUsuario);
+                return amistades;
+            });
+        }
+
+        public RespuestaServicio<Logica.Amistad> ObtenerAmistad(int idAmistad)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                var amistad = GestorAmistad.ObtenerAmistad(idAmistad);
+                return amistad;
+            });
+        }
+    }
+
     public partial class ServicioImplementacion : IGestionPartida
     {
         public bool CrearNuevaPartida(string codigoSala)
