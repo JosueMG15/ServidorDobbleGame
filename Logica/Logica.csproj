@@ -53,7 +53,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Amistad.cs" />
     <Compile Include="CuentaUsuario.cs" />
+    <Compile Include="GestorAmistad.cs" />
     <Compile Include="GestorErrores.cs" />
     <Compile Include="ModificarUsuario.cs" />
     <Compile Include="Partida.cs" />
