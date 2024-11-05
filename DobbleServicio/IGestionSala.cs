@@ -1,6 +1,7 @@
 ﻿using Logica;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -13,9 +14,9 @@ namespace DobbleServicio
     public interface IGestionSala
     {
         [OperationContract]
-        bool CrearNuevaSala(string nombreAnfitrion, string codigoSala);
+        bool CrearNuevaSala(string nombreUsuario, string codigoSala);
         [OperationContract]
-        bool UnirseASala(string nombreUsuario, int puntaje, byte[] foto, string codigoSala, string mensaje);
+        bool UnirseASala(string nombreUsuario, string codigoSala, string mensaje, bool esAnfitrion);
         [OperationContract]
         bool AbandonarSala(string nombreUsuario, string codigoSala, string mensaje);
 
@@ -25,7 +26,9 @@ namespace DobbleServicio
         void EnviarMensajeConexionSala(string nombreUsuario, string codigoSala, string mensaje);
         [OperationContract]
         string GenerarCodigoNuevaSala();
- 
+        [OperationContract(IsOneWay = true)]
+        void NotificarUsuarioConectado(string codigoSala);
+
     }
 
     [ServiceContract]
@@ -33,5 +36,10 @@ namespace DobbleServicio
     {
         [OperationContract(IsOneWay = true)]
         void MostrarMensajeSala(string mensaje);
+        [OperationContract(IsOneWay = true)]
+        void ActualizarUsuariosConectados(List<CuentaUsuario> usuariosConectados);
+        [OperationContract(IsOneWay = true)]
+        void CambiarVentanaAPartida();
+
     }
 }

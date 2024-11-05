@@ -22,6 +22,8 @@ namespace DobbleServicio
 
         [OperationContract]
         RespuestaServicio<CuentaUsuario> IniciarSesionJugador(string nombreUsuario, string contraseña);
+        [OperationContract]
+        void CerrarSesionJugador(string nombreUsuario);
 
         [OperationContract]
         RespuestaServicio<bool> ModificarNombreUsuario(int idCuenta, String nombreUsuario);

@@ -56,6 +56,7 @@
     <Compile Include="CuentaUsuario.cs" />
     <Compile Include="GestorErrores.cs" />
     <Compile Include="ModificarUsuario.cs" />
+    <Compile Include="Partida.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistroUsuario.cs" />
     <Compile Include="RespuestaServicio.cs" />
