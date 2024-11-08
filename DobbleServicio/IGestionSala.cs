@@ -29,6 +29,8 @@ namespace DobbleServicio
         string GenerarCodigoNuevaSala();
         [OperationContract(IsOneWay = true)]
         void NotificarUsuarioConectado(string codigoSala);
+        [OperationContract]
+        bool HayEspacioSala(string codigoSala);
 
     }
 

@@ -304,6 +304,14 @@ namespace DobbleServicio
             }
         }
 
+        public bool HayEspacioSala(string codigoSala)
+        {
+            if (salas.TryGetValue(codigoSala, out Sala sala) && sala.Usuarios.Count <= sala.U)
+            {
+
+            }
+        }
+
         private void EnviarNotificacionUsuarios(Sala sala)
         {
             var usuariosParaNotificar = sala.Usuarios.ToList(); 
