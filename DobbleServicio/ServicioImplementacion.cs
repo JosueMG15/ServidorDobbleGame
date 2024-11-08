@@ -357,9 +357,22 @@ namespace DobbleServicio
         {
             return GestorErrores.Ejecutar(() =>
             {
-                return GestorAmistad.EnviarSolicitudAmistad(idUsuarioPrincipal, nombreUsuarioAmigo);
+                // Llamamos al método en la capa lógica para crear la solicitud
+                bool resultado = GestorAmistad.EnviarSolicitudAmistad(idUsuarioPrincipal, nombreUsuarioAmigo);
+
+                /*if (resultado)
+                {
+                    // Obtener el canal de callback del cliente actual
+                    var callback = OperationContext.Current.GetCallbackChannel<IAmistadCallback>();
+
+                    // Invocar la notificación en el cliente destinatario
+                    callback?.NotificarNuevaSolicitudAmistad(nombreUsuarioAmigo, idUsuarioPrincipal);
+                }*/
+
+                return resultado;
             });
         }
+
 
         public RespuestaServicio<bool> AmistadYaExiste(int idUsuarioPrincipal, String nombreUsuarioAmigo)
         {
@@ -420,6 +433,8 @@ namespace DobbleServicio
                 return amistad;
             });
         }
+
+        //CALLBACKS
     }
 
     public partial class ServicioImplementacion : IGestionPartida
