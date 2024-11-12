@@ -70,8 +70,16 @@ namespace DobbleServicio
             return respuestaServicio;
         }
 
-        public void CerrarSesionJugador(string nombreUsuario)
+        public void CerrarSesionJugador(string nombreUsuario, string mensaje)
         {
+            foreach (var sala in salas.Values)
+            {
+                if (sala.Usuarios.Any(u => u.Usuario == nombreUsuario))
+                {
+                    AbandonarSala(nombreUsuario, sala.CodigoSala, mensaje);
+                }
+            }
+
             if (UsuariosActivos.TryRemove(nombreUsuario, out CuentaUsuario cuentaUsuario))
             {
                 Console.WriteLine($"El usuario {nombreUsuario} ha sido desconectado");
@@ -139,12 +147,20 @@ namespace DobbleServicio
 
         public bool AbandonarSala(string nombreUsuario, string codigoSala, string mensaje)
         {
-            if (salas.TryGetValue(codigoSala, out Sala sala))
+            if (!salas.TryGetValue(codigoSala, out Sala sala))
+            {
+                return false;
+            }
+
+            bool resultado = GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
                 lock (sala.BloqueoSala)
                 {
                     CuentaUsuario cuentaUsuario = sala.Usuarios.FirstOrDefault(c => c.Usuario == nombreUsuario);
-                    if (cuentaUsuario == null) return false;
+                    if (cuentaUsuario == null)
+                    {
+                        return false;
+                    }
 
                     if (sala.Usuarios.Count > 1)
                     {
@@ -153,36 +169,66 @@ namespace DobbleServicio
 
                     sala.Usuarios.Remove(cuentaUsuario);
 
-                    if (sala.Usuarios.Count == 0 && salas.TryRemove(codigoSala, out _))
-                    {
-                        return true;
-                    }
+                    return sala.Usuarios.Count == 0 && salas.TryRemove(codigoSala, out _);
                 }
+            }, false);
 
+            if (resultado == false && salas.ContainsKey(codigoSala))
+            {
                 EnviarMensajeConexionSala(nombreUsuario, codigoSala, mensaje);
                 NotificarUsuarioConectado(codigoSala);
-
-                return true;
             }
 
-            return false;
+            return resultado;
+        }
+
+        public void ExpulsarJugador(string nombreUsuario, string codigoSala, string mensaje)
+        {
+            if (!salas.TryGetValue(codigoSala, out Sala sala))
+            {
+                return;
+            }
+
+            bool resultado = GestorErrores.EjecutarConManejoDeExcepciones(() =>
+            {
+                CuentaUsuario usuarioAExpulsar = sala.Usuarios.FirstOrDefault(u => u.Usuario == nombreUsuario);
+                if (usuarioAExpulsar == null)
+                {
+                    return false;
+                }
+
+                NotificarUsuario(usuarioAExpulsar, callback => callback.NotificarExpulsionAJugador());
+
+                sala.Usuarios.Remove(usuarioAExpulsar);
+                return true;
+            }, false);
+
+            if (resultado && salas.ContainsKey(codigoSala))
+            {
+                EnviarMensajeConexionSala(nombreUsuario, codigoSala, mensaje);
+                NotificarUsuarioConectado(codigoSala);
+            }
         }
 
         private void AsignarNuevoAnfitrion(Sala sala, string usuarioActual)
         {
             lock(sala.BloqueoSala)
             {
-                var cuentaActual = sala.Usuarios.FirstOrDefault(u => u.Usuario == usuarioActual && u.EsAnfitrion);
-                if (cuentaActual != null)
+                GestorErrores.EjecutarConManejoDeExcepciones(() =>
                 {
-                    cuentaActual.EsAnfitrion = false;
-
-                    var nuevoAnfitrion = sala.Usuarios.FirstOrDefault(u => u.Usuario != usuarioActual);
-                    if (nuevoAnfitrion != null)
+                    var cuentaActual = sala.Usuarios.FirstOrDefault(u => u.Usuario == usuarioActual && u.EsAnfitrion);
+                    if (cuentaActual != null)
                     {
-                        nuevoAnfitrion.EsAnfitrion = true;
+                        cuentaActual.EsAnfitrion = false;
+
+                        var nuevoAnfitrion = sala.Usuarios.FirstOrDefault(u => u.Usuario != usuarioActual);
+                        if (nuevoAnfitrion != null)
+                        {
+                            nuevoAnfitrion.EsAnfitrion = true;
+                            NotificarUsuario(nuevoAnfitrion, callback => callback.ConvertirEnAnfitrion());
+                        }
                     }
-                }
+                });
             }
         }
 
@@ -193,28 +239,11 @@ namespace DobbleServicio
                 return false;
             }
 
-            try
+            return GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
-                var sala = new Sala();
-                if (salas.TryAdd(codigoSala, sala))
-                {
-                    return true;
-                }
-            }
-            catch (CommunicationException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            catch (TimeoutException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-            return false;
+                var sala = new Sala(codigoSala);
+                return (salas.TryAdd(codigoSala, sala));
+            }, false);
         }
 
         public void EnviarMensajeSala(string nombreUsuario, string codigoSala, string mensaje)
@@ -269,63 +298,65 @@ namespace DobbleServicio
             if (!UsuariosActivos.TryGetValue(nombreUsuario, out CuentaUsuario cuentaUsuario))
                 return false;
 
-            if (salas.TryGetValue(codigoSala, out Sala sala))
+            return GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
-                cuentaUsuario.ContextoOperacion = OperationContext.Current;
-                cuentaUsuario.EsAnfitrion = esAnfitrion;
-                EnviarMensajeConexionSala(nombreUsuario, codigoSala, mensaje);
-
-                lock (sala.BloqueoSala)
+                if (salas.TryGetValue(codigoSala, out Sala sala))
                 {
-                    if (!sala.Usuarios.Contains(cuentaUsuario))
+                    cuentaUsuario.ContextoOperacion = OperationContext.Current;
+                    cuentaUsuario.EsAnfitrion = esAnfitrion;
+                    EnviarMensajeConexionSala(nombreUsuario, codigoSala, mensaje);
+
+                    lock (sala.BloqueoSala)
                     {
-                        sala.Usuarios.Add(cuentaUsuario);
+                        if (!sala.Usuarios.Contains(cuentaUsuario))
+                        {
+                            sala.Usuarios.Add(cuentaUsuario);
+                        }
                     }
+
+                    return true;
                 }
-
-                return true;
-            }
-
-            return false;
+                return false;
+            }, false);
         }
 
         public void NotificarUsuarioConectado(string codigoSala)
         {
-            if (salas.TryGetValue(codigoSala, out Sala sala))
+            GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
-                lock (sala.BloqueoSala)
+                if (salas.TryGetValue(codigoSala, out Sala sala))
                 {
-                    EnviarNotificacionUsuarios(sala);
-
-                    sala.Usuarios = sala.Usuarios
-                        .Where(u => u.ContextoOperacion != null &&
-                            ((ICommunicationObject)u.ContextoOperacion.GetCallbackChannel<ISalaCallback>()).State == CommunicationState.Opened).ToList();
+                    lock (sala.BloqueoSala)
+                    {
+                        foreach (var usuario in sala.Usuarios.ToList())
+                        {
+                            NotificarUsuario(usuario, callback => callback.ActualizarUsuariosConectados(sala.Usuarios));
+                        }
+                    }
                 }
-            }
+            });
         }
 
-        public bool HayEspacioSala(string codigoSala)
+        public void NotificarInstanciaVentanaPartida(string codigoSala)
         {
-            if (salas.TryGetValue(codigoSala, out Sala sala) && sala.Usuarios.Count <= sala.U)
+            GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
-
-            }
+                if (salas.TryGetValue(codigoSala, out Sala sala))
+                {
+                    lock (sala.BloqueoSala)
+                    {
+                        foreach (var usuario in sala.Usuarios.ToList())
+                        {
+                            NotificarUsuario(usuario, callback => callback.InstanciarVentanaPartida());
+                        }
+                    }
+                }
+            });
         }
-
-        private void EnviarNotificacionUsuarios(Sala sala)
-        {
-            var usuariosParaNotificar = sala.Usuarios.ToList(); 
-
-            foreach (var usuario in usuariosParaNotificar)
-            {
-                NotificarUsuario(usuario, callback => callback.ActualizarUsuariosConectados(sala.Usuarios));
-            }
-        }
-
 
         private void NotificarUsuario(CuentaUsuario usuario, Action<ISalaCallback> accion)
         {
-            try
+            GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
                 if (usuario.ContextoOperacion != null)
                 {
@@ -335,20 +366,19 @@ namespace DobbleServicio
                         accion(callback);
                     }
                 }
-            }
-            catch(CommunicationException ex)
-            {
-                Console.WriteLine($"Erro de comunicación con {usuario.Usuario}: {ex.Message}");
-            }
-            catch (TimeoutException ex)
-            {
-                Console.WriteLine($"Error de tiempo de espera con {usuario.Usuario}: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error general con {usuario.Usuario}: {ex}");
-            }
+            });
         }
+
+        public bool HayEspacioSala(string codigoSala)
+        {
+            return salas.TryGetValue(codigoSala, out Sala sala) && sala.HayEspacioEnSala();
+        }
+
+        public bool ExisteSala(string codigoSala)
+        {
+            return salas.ContainsKey(codigoSala);
+        }
+
     }
 
     public partial class ServicioImplementacion : IGestionAmigos
@@ -448,147 +478,106 @@ namespace DobbleServicio
 
             if (salas.TryGetValue(codigoSala, out Sala sala))
             {
+                ActualizarContexto(sala);
+
                 var partida = new Partida()
                 {
                     CuentasEnPartida = sala.Usuarios,
                 };
 
-                sala.partida = partida;
-
-                try
+                return GestorErrores.EjecutarConManejoDeExcepciones(() =>
                 {
-                    lock (sala.partida.BloqueoPartida)
+                    lock (sala.BloqueoSala)
                     {
-                        sala.partida = partida;
+                        sala.PartidaSala = partida;
                         return true;
                     }
-                }
-                catch (CommunicationException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                catch (TimeoutException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
+                }, false);
             }
 
-
             return false;
+        }
+
+        private void ActualizarContexto(Sala sala)
+        {
+            foreach (var usuario in  sala.Usuarios)
+            {
+                usuario.ContextoOperacion = OperationContext.Current;
+            }
         }
 
         public void UnirJugadoresAPartida(string codigoSala)
         {
             if (salas.TryGetValue(codigoSala, out Sala sala))
 
-            lock (sala.partida.BloqueoPartida)
+            lock (sala.PartidaSala.BloqueoPartida)
             {
-                try
+                /*GestorErrores.EjecutarConManejoDeExcepciones(()  =>
                 {
-                    foreach (var usuario in sala.partida.CuentasEnPartida.ToList())
-                    {
-                        if (usuario.ContextoOperacion != null)
-                        {
-                            var callback = usuario.ContextoOperacion.GetCallbackChannel<ISalaCallback>();
-                            if (((ICommunicationObject)callback).State == CommunicationState.Opened)
-                            {
-                                callback.CambiarVentanaAPartida();
-                            }
-                        }
-                    }
-                }
-                catch (CommunicationException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                catch (TimeoutException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
-            }
-        }
-        public bool AbandonarPartida(string nombreUsuario, string codigoSala)
-        {
-            if (salas.TryGetValue(codigoSala, out Sala sala))
-            {
-                try
-                {
-                    lock (sala.partida.BloqueoPartida)
-                    {
-                        CuentaUsuario cuentaUsuario = sala.partida.CuentasEnPartida.FirstOrDefault(c => c.Usuario.Equals(nombreUsuario));
-                        if (cuentaUsuario == null) return false;
-
-                        sala.partida.CuentasEnPartida.Remove(cuentaUsuario);
-
-                        if (sala.partida.CuentasEnPartida.Count == 0)
-                        {
-                            sala.partida = null;
-                        }
-                        else
-                        {
-                            NotificarActualizacionDeJugadoresEnpartida(codigoSala);
-                        }
-
-                        return true;
-                    }
-                }
-                catch (CommunicationException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                catch (TimeoutException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
-            }
-
-            return false;
-        }
-
-        public void NotificarActualizacionDeJugadoresEnpartida(string codigoSala)
-        {
-            if (salas.TryGetValue(codigoSala, out Sala sala))
-
-            lock (sala.partida.BloqueoPartida)
-            {
-                try
-                {
-                    foreach (var usuario in sala.partida.CuentasEnPartida.ToList())
+                    foreach (var usuario in sala.PartidaSala.CuentasEnPartida.ToList())
                     {
                         if (usuario.ContextoOperacion != null)
                         {
                             var callback = usuario.ContextoOperacion.GetCallbackChannel<IPartidaCallback>();
                             if (((ICommunicationObject)callback).State == CommunicationState.Opened)
                             {
-                                callback.ActualizarJugadoresEnPartida(sala.partida.CuentasEnPartida);
+                                callback.CambiarVentanaAPartida();
                             }
                         }
                     }
-                }
-                catch (CommunicationException ex)
+                });*/
+            }
+        }
+        public bool AbandonarPartida(string nombreUsuario, string codigoSala)
+        {
+            if (salas.TryGetValue(codigoSala, out Sala sala))
+            {
+                return GestorErrores.EjecutarConManejoDeExcepciones(() =>
                 {
-                    Console.WriteLine(ex.Message);
-                }
-                catch (TimeoutException ex)
+                    lock (sala.PartidaSala.BloqueoPartida)
+                    {
+                        CuentaUsuario cuentaUsuario = sala.PartidaSala.CuentasEnPartida.FirstOrDefault(c => c.Usuario.Equals(nombreUsuario));
+                        if (cuentaUsuario == null) return false;
+
+                        sala.PartidaSala.CuentasEnPartida.Remove(cuentaUsuario);
+
+                        if (sala.PartidaSala.CuentasEnPartida.Count == 0)
+                        {
+                            sala.PartidaSala = null;
+                        }
+                        else
+                        {
+                            NotificarActualizacionDeJugadoresEnPartida(codigoSala);
+                        }
+
+                        return true;
+                    }
+                }, false);
+            }
+
+            return false;
+        }
+
+        public void NotificarActualizacionDeJugadoresEnPartida(string codigoSala)
+        {
+            if (salas.TryGetValue(codigoSala, out Sala sala))
+
+            lock (sala.BloqueoSala)
+            {
+                GestorErrores.EjecutarConManejoDeExcepciones(() =>
                 {
-                    Console.WriteLine(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
+                    foreach (var usuario in sala.PartidaSala.CuentasEnPartida.ToList())
+                    {
+                        if (usuario.ContextoOperacion != null)
+                        {
+                            var callback = usuario.ContextoOperacion.GetCallbackChannel<IPartidaCallback>();
+                            if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                            {
+                                callback.ActualizarJugadoresEnPartida(sala.PartidaSala.CuentasEnPartida);
+                            }
+                        }
+                    }
+                });
             }
         }
     }

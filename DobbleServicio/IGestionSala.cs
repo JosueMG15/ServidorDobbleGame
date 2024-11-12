@@ -15,23 +15,28 @@ namespace DobbleServicio
     public interface IGestionSala
     {
         [OperationContract]
+        string GenerarCodigoNuevaSala();
+        [OperationContract]
         bool CrearNuevaSala(string nombreUsuario, string codigoSala);
         [OperationContract]
         bool UnirseASala(string nombreUsuario, string codigoSala, string mensaje, bool esAnfitrion);
         [OperationContract]
         bool AbandonarSala(string nombreUsuario, string codigoSala, string mensaje);
+        [OperationContract(IsOneWay = true)]
+        void ExpulsarJugador(string nombreUsuario, string codigoSala, string mensaje);
 
         [OperationContract(IsOneWay = true)]
         void EnviarMensajeSala(string nombreUsuario, string codigoSala, string mensaje);
         [OperationContract(IsOneWay = true)]
         void EnviarMensajeConexionSala(string nombreUsuario, string codigoSala, string mensaje);
-        [OperationContract]
-        string GenerarCodigoNuevaSala();
         [OperationContract(IsOneWay = true)]
         void NotificarUsuarioConectado(string codigoSala);
         [OperationContract]
         bool HayEspacioSala(string codigoSala);
-
+        [OperationContract]
+        bool ExisteSala(string codigoSala);
+        [OperationContract(IsOneWay = true)]
+        void NotificarInstanciaVentanaPartida(string codigoSala);
     }
 
     [ServiceContract]
@@ -42,7 +47,10 @@ namespace DobbleServicio
         [OperationContract(IsOneWay = true)]
         void ActualizarUsuariosConectados(List<CuentaUsuario> usuariosConectados);
         [OperationContract(IsOneWay = true)]
-        void CambiarVentanaAPartida();
-
+        void ConvertirEnAnfitrion();
+        [OperationContract(IsOneWay = true)]
+        void NotificarExpulsionAJugador();
+        [OperationContract(IsOneWay = true)]
+        void InstanciarVentanaPartida();
     }
 }

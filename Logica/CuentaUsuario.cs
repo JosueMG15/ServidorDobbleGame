@@ -30,6 +30,8 @@ namespace Logica
         public bool EsAnfitrion {  get; set; }
         [DataMember]
         public int PuntosEnPartida { get; set; }
+        [DataMember]
+        public int NumeroJugador { get; set; }
         public OperationContext ContextoOperacion { get; set; }
         
     }

@@ -1,0 +1,122 @@
+2024-11-11 09:52:24,045 [22] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.IPartidaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass35_0.<NotificarActualizacionDeJugadoresEnpartida>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 554
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 10:28:22,703 [16] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.IPartidaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass35_0.<NotificarActualizacionDeJugadoresEnpartida>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 554
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 10:33:22,510 [19] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.IPartidaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass35_0.<NotificarActualizacionDeJugadoresEnpartida>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 554
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 10:50:10,035 [14] ERROR Logica.Registro - Excepción no manejada: Referencia a objeto no establecida como instancia de un objeto.. 
+Traza:    en DobbleServicio.ServicioImplementacion.<>c__DisplayClass32_1.<CrearNuevaPartida>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 478
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones[T](Func`1 funcion, T valorPorDefecto) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 47. 
+Fuente: DobbleServicio.
+2024-11-11 19:14:10,194 [11] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.IPartidaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass33_0.<UnirJugadoresAPartida>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 501
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 20:19:23,358 [22] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 353
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 20:19:23,392 [22] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 353
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 20:33:08,467 [4] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 353
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 20:33:08,480 [4] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 353
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 21:32:29,939 [9] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 21:32:29,956 [9] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 21:50:22,957 [13] ERROR Logica.Registro - Excepción no manejada: Referencia a objeto no establecida como instancia de un objeto.. 
+Traza:    en DobbleServicio.ServicioImplementacion.<>c__DisplayClass36_0.<NotificarActualizacionDeJugadoresEnPartida>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 569
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: DobbleServicio.
+2024-11-11 21:50:22,987 [13] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 21:50:22,998 [13] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 21:53:59,517 [8] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 21:53:59,526 [8] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 22:09:45,556 [6] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 22:09:45,582 [6] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 22:12:11,063 [13] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 22:12:11,088 [13] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 22:12:22,921 [12] ERROR Logica.Registro - Excepción no manejada: No se puede convertir el proxy transparente al tipo 'DobbleServicio.ISalaCallback'.. 
+Traza:    en System.ServiceModel.OperationContext.GetCallbackChannel[T]()
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass21_0.<NotificarUsuario>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 363
+   en Logica.GestorErrores.EjecutarConManejoDeExcepciones(Action accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 72. 
+Fuente: System.ServiceModel.
+2024-11-11 23:21:03,992 [3] ERROR Logica.Registro - Excepción de EntityException: The underlying provider failed on Open.. 
+Traza:    en System.Data.Entity.Core.EntityClient.EntityConnection.Open()
+   en System.Data.Entity.Core.Objects.ObjectContext.EnsureConnection(Boolean shouldMonitorTransactions)
+   en System.Data.Entity.Core.Objects.ObjectContext.ExecuteInTransaction[T](Func`1 func, IDbExecutionStrategy executionStrategy, Boolean startLocalTransaction, Boolean releaseConnectionOnSuccess)
+   en System.Data.Entity.Core.Objects.ObjectQuery`1.<>c__DisplayClass41_0.<GetResults>b__0()
+   en System.Data.Entity.SqlServer.DefaultSqlExecutionStrategy.Execute[TResult](Func`1 operation)
+   en System.Data.Entity.Core.Objects.ObjectQuery`1.GetResults(Nullable`1 forMergeOption)
+   en System.Data.Entity.Core.Objects.ObjectQuery`1.<System.Collections.Generic.IEnumerable<T>.GetEnumerator>b__31_0()
+   en System.Data.Entity.Internal.LazyEnumerator`1.MoveNext()
+   en System.Linq.Enumerable.FirstOrDefault[TSource](IEnumerable`1 source)
+   en System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.<>c__14`1.<GetElementFunction>b__14_1(IEnumerable`1 sequence)
+   en System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.ExecuteSingle[TResult](IEnumerable`1 query, Expression queryRoot)
+   en System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.System.Linq.IQueryProvider.Execute[TResult](Expression expression)
+   en System.Data.Entity.Internal.Linq.DbQueryProvider.Execute[TResult](Expression expression)
+   en System.Linq.Queryable.FirstOrDefault[TSource](IQueryable`1 source)
+   en Logica.RegistroUsuario.IniciarSesion(String nombreUsuario, String contraseña) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\RegistroUsuario.cs:línea 98
+   en DobbleServicio.ServicioImplementacion.<>c__DisplayClass4_0.<IniciarSesionJugador>b__0() en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\DobbleServicio\ServicioImplementacion.cs:línea 58
+   en Logica.GestorErrores.Ejecutar[T](Func`1 accion) en C:\Users\sosue\source\repos\ServidorDobbleGame\ServidorDobbleGame\Logica\GestorErrores.cs:línea 25. 
+Fuente: EntityFramework.

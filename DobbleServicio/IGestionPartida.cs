@@ -13,10 +13,12 @@ namespace DobbleServicio
     {
         [OperationContract]
         bool CrearNuevaPartida(string codigoSala);
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void UnirJugadoresAPartida(string codigoSala);
         [OperationContract]
         bool AbandonarPartida(string nombreUsuario, string codigoSala);
+        [OperationContract(IsOneWay = true)]
+        void NotificarActualizacionDeJugadoresEnPartida(string codigoSala);
 
     }
 
