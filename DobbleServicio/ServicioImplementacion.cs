@@ -339,23 +339,16 @@ namespace DobbleServicio
             });
         }
 
-        public bool HayEspacioSala(string codigoSala)
-        {
-            /*if (salas.TryGetValue(codigoSala, out Sala sala) && sala.Usuarios.Count <= sala.U)
-            {
-
-            }*/
-            return false;
-        }
-
         private void EnviarNotificacionUsuarios(Sala sala)
         {
-            var usuariosParaNotificar = sala.Usuarios.ToList(); 
+            var usuariosParaNotificar = sala.Usuarios.ToList();
 
             foreach (var usuario in usuariosParaNotificar)
             {
                 NotificarUsuario(usuario, callback => callback.ActualizarUsuariosConectados(sala.Usuarios));
             }
+        }
+
         public void NotificarInstanciaVentanaPartida(string codigoSala)
         {
             GestorErrores.EjecutarConManejoDeExcepciones(() =>
@@ -568,7 +561,7 @@ namespace DobbleServicio
 
         private void ActualizarContexto(Sala sala)
         {
-            foreach (var usuario in  sala.Usuarios)
+            foreach (var usuario in sala.Usuarios)
             {
                 usuario.ContextoOperacion = OperationContext.Current;
             }
@@ -578,23 +571,23 @@ namespace DobbleServicio
         {
             if (salas.TryGetValue(codigoSala, out Sala sala))
 
-            lock (sala.PartidaSala.BloqueoPartida)
-            {
-                /*GestorErrores.EjecutarConManejoDeExcepciones(()  =>
+                lock (sala.PartidaSala.BloqueoPartida)
                 {
-                    foreach (var usuario in sala.PartidaSala.CuentasEnPartida.ToList())
+                    /*GestorErrores.EjecutarConManejoDeExcepciones(()  =>
                     {
-                        if (usuario.ContextoOperacion != null)
+                        foreach (var usuario in sala.PartidaSala.CuentasEnPartida.ToList())
                         {
-                            var callback = usuario.ContextoOperacion.GetCallbackChannel<IPartidaCallback>();
-                            if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                            if (usuario.ContextoOperacion != null)
                             {
-                                callback.CambiarVentanaAPartida();
+                                var callback = usuario.ContextoOperacion.GetCallbackChannel<IPartidaCallback>();
+                                if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                                {
+                                    callback.CambiarVentanaAPartida();
+                                }
                             }
                         }
-                    }
-                });*/
-            }
+                    });*/
+                }
         }
         public bool AbandonarPartida(string nombreUsuario, string codigoSala)
         {
@@ -629,34 +622,23 @@ namespace DobbleServicio
         public void NotificarActualizacionDeJugadoresEnPartida(string codigoSala)
         {
             if (salas.TryGetValue(codigoSala, out Sala sala))
-
-            lock (sala.BloqueoSala)
             {
-                GestorErrores.EjecutarConManejoDeExcepciones(() =>
+                lock (sala.BloqueoSala)
                 {
-                    foreach (var usuario in sala.PartidaSala.CuentasEnPartida.ToList())
+                    GestorErrores.EjecutarConManejoDeExcepciones(() =>
                     {
-                        if (usuario.ContextoOperacion != null)
+                        foreach (var usuario in sala.PartidaSala.CuentasEnPartida.ToList())
                         {
-                            var callback = usuario.ContextoOperacion.GetCallbackChannel<IPartidaCallback>();
-                            if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                            if (usuario.ContextoOperacion != null)
                             {
-                                callback.ActualizarJugadoresEnPartida(sala.partida.CuentasEnPartida);
+                                var callback = usuario.ContextoOperacion.GetCallbackChannel<IPartidaCallback>();
+                                if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                                {
+                                    callback.ActualizarJugadoresEnPartida(sala.PartidaSala.CuentasEnPartida);
+                                }
                             }
                         }
-                    }
-                }
-                catch (CommunicationException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                catch (TimeoutException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
+                    });
                 }
             }
         }
@@ -676,14 +658,6 @@ namespace DobbleServicio
         private string GenerarCodigo()
         {
             return new Random().Next(100000, 999999).ToString(); // Código de 6 dígitos
-                                callback.ActualizarJugadoresEnPartida(sala.PartidaSala.CuentasEnPartida);
-                            }
-                        }
-                    }
-                });
-            }
         }
     }
-
-
 }
