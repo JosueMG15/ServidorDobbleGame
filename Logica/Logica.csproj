@@ -61,6 +61,7 @@
     <Compile Include="Amistad.cs" />
     <Compile Include="CuentaUsuario.cs" />
     <Compile Include="GestorAmistad.cs" />
+    <Compile Include="GestorCorreo.cs" />
     <Compile Include="GestorErrores.cs" />
     <Compile Include="ModificarUsuario.cs" />
     <Compile Include="Partida.cs" />

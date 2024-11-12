@@ -208,11 +208,39 @@ namespace Logica
                     estadoSolicitud = amistad.estadoSolicitud ?? true,
                     UsuarioPrincipalId = amistad.UsuarioPrincipalId,
                     UsuarioAmigoId = amistad.UsuarioAmigoId
-                    // Agrega otras propiedades si es necesario
                 };
 
                 return amistadLogica;
             }
         }
+
+        public static Logica.Amistad ObtenerSolicitud()
+        {
+            using (var contexto = new DobbleBDEntidades())
+            {
+                // Obtener el último registro de la tabla Amistad
+                var amistad = contexto.Amistad
+                    .OrderByDescending(a => a.idAmistad)
+                    .FirstOrDefault();
+
+                // Verificar si se encontró algún registro
+                if (amistad == null)
+                {
+                    return null; // Maneja el caso en que no hay registros
+                }
+
+                // Mapeo manual de DataAccess.Amistad a Logica.Amistad
+                var amistadLogica = new Logica.Amistad
+                {
+                    idAmistad = amistad.idAmistad,
+                    estadoSolicitud = amistad.estadoSolicitud ?? false,
+                    UsuarioPrincipalId = amistad.UsuarioPrincipalId,
+                    UsuarioAmigoId = amistad.UsuarioAmigoId
+                };
+
+                return amistadLogica;
+            }
+        }
+
     }
 }

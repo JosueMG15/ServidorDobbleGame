@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Runtime.Remoting.Messaging;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -337,6 +339,23 @@ namespace DobbleServicio
             });
         }
 
+        public bool HayEspacioSala(string codigoSala)
+        {
+            /*if (salas.TryGetValue(codigoSala, out Sala sala) && sala.Usuarios.Count <= sala.U)
+            {
+
+            }*/
+            return false;
+        }
+
+        private void EnviarNotificacionUsuarios(Sala sala)
+        {
+            var usuariosParaNotificar = sala.Usuarios.ToList(); 
+
+            foreach (var usuario in usuariosParaNotificar)
+            {
+                NotificarUsuario(usuario, callback => callback.ActualizarUsuariosConectados(sala.Usuarios));
+            }
         public void NotificarInstanciaVentanaPartida(string codigoSala)
         {
             GestorErrores.EjecutarConManejoDeExcepciones(() =>
@@ -381,28 +400,11 @@ namespace DobbleServicio
 
     }
 
-    public partial class ServicioImplementacion : IGestionAmigos
+    public partial class ServicioImplementacion : IGestionAmigos, IGestionNotificacionesAmigos
     {
-        public RespuestaServicio<bool> EnviarSolicitudAmistad(int idUsuarioPrincipal, String nombreUsuarioAmigo)
-        {
-            return GestorErrores.Ejecutar(() =>
-            {
-                // Llamamos al método en la capa lógica para crear la solicitud
-                bool resultado = GestorAmistad.EnviarSolicitudAmistad(idUsuarioPrincipal, nombreUsuarioAmigo);
-
-                /*if (resultado)
-                {
-                    // Obtener el canal de callback del cliente actual
-                    var callback = OperationContext.Current.GetCallbackChannel<IAmistadCallback>();
-
-                    // Invocar la notificación en el cliente destinatario
-                    callback?.NotificarNuevaSolicitudAmistad(nombreUsuarioAmigo, idUsuarioPrincipal);
-                }*/
-
-                return resultado;
-            });
-        }
-
+        // Diccionario para almacenar los callbacks de los clientes conectados
+        private readonly ConcurrentDictionary<string, IGestionAmigosCallback> clientesConectados =
+            new ConcurrentDictionary<string, IGestionAmigosCallback>();
 
         public RespuestaServicio<bool> AmistadYaExiste(int idUsuarioPrincipal, String nombreUsuarioAmigo)
         {
@@ -430,19 +432,44 @@ namespace DobbleServicio
             });
         }
 
-        public RespuestaServicio<bool> EliminarAmistad(int idAmistad)
+        public RespuestaServicio<bool> EliminarAmistad(int idAmistad, String nombreUsuarioAmigo)
         {
             return GestorErrores.Ejecutar(() =>
             {
-                return GestorAmistad.EliminarAmistad(idAmistad);
+                bool eliminacionDeAmistad = GestorAmistad.EliminarAmistad(idAmistad);
+
+                if(nombreUsuarioAmigo != null)
+                {
+                    if (eliminacionDeAmistad)
+                    {
+                        if (clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callback))
+                        {
+                            callback.NotificarCambio();
+                        }
+                    }
+                }
+
+                return eliminacionDeAmistad;
             });
         }
 
-        public RespuestaServicio<bool> AceptarSolicitud(int idAmistad)
+        public RespuestaServicio<bool> AceptarSolicitud(int idAmistad, String nombreUsuarioAmigo)
         {
             return GestorErrores.Ejecutar(() =>
             {
-                return GestorAmistad.AceptarSolicitud(idAmistad);
+                bool aceptacionDeAmistad = GestorAmistad.AceptarSolicitud(idAmistad);
+
+                if (aceptacionDeAmistad)
+                {
+                    // Verifica si el destinatario está conectado y tiene un callback disponible
+                    if (clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callback))
+                    {
+                        // Llama al método de callback para notificar al destinatario
+                        callback.NotificarCambio();
+                    }
+                }
+
+                return aceptacionDeAmistad;
             });
         }
 
@@ -464,7 +491,48 @@ namespace DobbleServicio
             });
         }
 
-        //CALLBACKS
+        public RespuestaServicio<Logica.Amistad> ObtenerSolicitud()
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                var solicitud = GestorAmistad.ObtenerSolicitud();
+                return solicitud;
+            });
+        }
+
+        public RespuestaServicio<bool> EnviarSolicitudAmistad(int idUsuarioPrincipal, string nombreUsuarioAmigo)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                // Guarda la solicitud de amistad en la base de datos
+                bool solicitudEnviada = GestorAmistad.EnviarSolicitudAmistad(idUsuarioPrincipal, nombreUsuarioAmigo);
+
+                if (solicitudEnviada)
+                {
+                    // Verifica si el destinatario está conectado y tiene un callback disponible
+                    if (clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callback))
+                    {
+                        // Llama al método de callback para notificar al destinatario
+                        callback.NotificarSolicitudAmistad();
+                    }
+                }
+
+                return solicitudEnviada;
+            });
+        }
+
+        // Método para conectar un cliente y registrar su callback
+        public void ConectarCliente(string nombreUsuario)
+        {
+            var callback = OperationContext.Current.GetCallbackChannel<IGestionAmigosCallback>();
+            clientesConectados.TryAdd(nombreUsuario, callback);
+        }
+
+        // Método para desconectar un cliente y eliminar su callback
+        public void DesconectarCliente(string nombreUsuario)
+        {
+            clientesConectados.TryRemove(nombreUsuario, out _);
+        }
     }
 
     public partial class ServicioImplementacion : IGestionPartida
@@ -573,6 +641,41 @@ namespace DobbleServicio
                             var callback = usuario.ContextoOperacion.GetCallbackChannel<IPartidaCallback>();
                             if (((ICommunicationObject)callback).State == CommunicationState.Opened)
                             {
+                                callback.ActualizarJugadoresEnPartida(sala.partida.CuentasEnPartida);
+                            }
+                        }
+                    }
+                }
+                catch (CommunicationException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                catch (TimeoutException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+        }
+    }
+
+    public partial class ServicioImplementacion : IGestionCorreos
+    {
+        public RespuestaServicio<bool> EnviarCodigo(string correo)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                string codigo = GenerarCodigo();
+                return GestorCorreo.EnviarCorreo(correo, codigo);
+            });
+        }
+
+        private string GenerarCodigo()
+        {
+            return new Random().Next(100000, 999999).ToString(); // Código de 6 dígitos
                                 callback.ActualizarJugadoresEnPartida(sala.PartidaSala.CuentasEnPartida);
                             }
                         }
@@ -581,5 +684,6 @@ namespace DobbleServicio
             }
         }
     }
+
 
 }

@@ -46,6 +46,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IGestionAmigos.cs" />
+    <Compile Include="IGestionAmigosCallback.cs" />
+    <Compile Include="IGestionCorreos.cs" />
     <Compile Include="IGestionJugador.cs" />
     <Compile Include="IGestionPartida.cs" />
     <Compile Include="IGestionSala.cs" />

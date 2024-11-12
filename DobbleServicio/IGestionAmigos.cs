@@ -26,22 +26,18 @@ namespace DobbleServicio
         RespuestaServicio<CuentaUsuario> ObtenerUsuario(int idUsuario);
 
         [OperationContract]
-        RespuestaServicio<bool> AceptarSolicitud(int idAmistad);
+        RespuestaServicio<bool> AceptarSolicitud(int idAmistad, String nombreUsuarioAmigo);
 
         [OperationContract]
-        RespuestaServicio<bool> EliminarAmistad(int idAmistad);
+        RespuestaServicio<bool> EliminarAmistad(int idAmistad, String nombreUsuarioAmigo);
 
         [OperationContract]
         RespuestaServicio<List<Amistad>> ObtenerAmistades(int idUsuario);
 
         [OperationContract]
         RespuestaServicio<Amistad> ObtenerAmistad(int idAmistad);
-    }
 
-    [ServiceContract(CallbackContract = typeof(IAmistadCallback))]
-    public interface IAmistadCallback
-    {
-        [OperationContract(IsOneWay = true)]
-        void NotificarNuevaSolicitudAmistad(string nombreUsuarioAmigo, int idUsuarioAmigo);
+        [OperationContract]
+        RespuestaServicio<Amistad> ObtenerSolicitud();
     }
 }
