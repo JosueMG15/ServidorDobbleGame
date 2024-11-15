@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /DataAccess/App.config
 /DobbleServicio/ServicioImplementacion.cs
+/Host/Registros/RegistrosServidor.txt

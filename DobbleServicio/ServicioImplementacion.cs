@@ -18,7 +18,7 @@ namespace DobbleServicio
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
                 ConcurrencyMode = ConcurrencyMode.Multiple)]
-    public partial class ServicioImplementacion : IGestionJugador
+    public partial class ServicioImplementacion : IGestionJugador, IGestionNotificacionesAmigos
     {
         private readonly ConcurrentDictionary<string, CuentaUsuario> UsuariosActivos = new ConcurrentDictionary<string, CuentaUsuario>();
         public RespuestaServicio<bool> RegistrarUsuario(CuentaUsuario cuentaUsuario)
@@ -104,6 +104,13 @@ namespace DobbleServicio
                 {
                     cuentaUsuario.Usuario = nombreUsuario;
                     UsuariosActivos.AddOrUpdate(nombreUsuario, cuentaUsuario, (key, odlValue) => cuentaUsuario);
+
+                    // Itera sobre todos los clientes conectados
+                    foreach (var cliente in clientesConectados.Values)
+                    {
+                        // Llama al método de callback para notificar a cada cliente
+                        cliente.NotificarCambio();
+                    }
                 }
 
                 return exito;
@@ -129,6 +136,13 @@ namespace DobbleServicio
                 {
                     cuentaUsuario.Foto = fotoUsuario;
                     UsuariosActivos.AddOrUpdate(cuentaUsuario.Usuario, cuentaUsuario, (key, oldValue) => cuentaUsuario);
+
+                    // Itera sobre todos los clientes conectados
+                    foreach (var cliente in clientesConectados.Values)
+                    {
+                        // Llama al método de callback para notificar a cada cliente
+                        cliente.NotificarCambio();
+                    }
                 }
 
                 return exito;
@@ -140,6 +154,15 @@ namespace DobbleServicio
             return GestorErrores.Ejecutar(() =>
             {
                 return ModificarUsuario.ValidarContraseña(idUsuario, contraseñaIngresada);
+            });
+        }
+
+        public RespuestaServicio<CuentaUsuario> ObtenerUsuarioPorCorreo(string correo)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                var obtenerUsuario = RegistroUsuario.ObtenerUsuarioPorCorreo(correo);
+                return obtenerUsuario;
             });
         }
     }
@@ -436,13 +459,24 @@ namespace DobbleServicio
             });
         }
 
-        public RespuestaServicio<bool> EliminarAmistad(int idAmistad, String nombreUsuarioAmigo)
+        public RespuestaServicio<bool> EliminarAmistad(int idAmistad, String nombreUsuario, String nombreUsuarioAmigo)
         {
             return GestorErrores.Ejecutar(() =>
             {
                 bool eliminacionDeAmistad = GestorAmistad.EliminarAmistad(idAmistad);
 
-                if(nombreUsuarioAmigo != null)
+                if(nombreUsuario != null)
+                {
+                    if (eliminacionDeAmistad)
+                    {
+                        if (clientesConectados.TryGetValue(nombreUsuario, out var callback))
+                        {
+                            callback.NotificarCambio();
+                        }
+                    }
+                }
+
+                if (nombreUsuarioAmigo != null)
                 {
                     if (eliminacionDeAmistad)
                     {
@@ -525,6 +559,7 @@ namespace DobbleServicio
             });
         }
 
+
         // Método para conectar un cliente y registrar su callback
         public void ConectarCliente(string nombreUsuario)
         {
@@ -537,6 +572,35 @@ namespace DobbleServicio
         {
             clientesConectados.TryRemove(nombreUsuario, out _);
         }
+
+
+        //LISTA LOCAL DE USUARIOS CONECTADOS
+        public void AgregarUsuario(string nombreUsuario)
+        {
+            UsuariosConectados.AgregarUsuario(nombreUsuario);
+            foreach (var cliente in clientesConectados.Values)
+            {
+                cliente.NotificarCambio();
+            }
+        }
+
+        public void QuitarUsuario(string nombreUsuario)
+        {
+            UsuariosConectados.QuitarUsuario(nombreUsuario);
+            foreach (var kvp in clientesConectados)
+            {
+                if (kvp.Key != nombreUsuario)
+                {
+                    kvp.Value.NotificarCambio();
+                }
+            }
+        }
+
+        public bool ObtenerUsuarioConectado(string nombreUsuario)
+        {
+            return UsuariosConectados.ObtenerUsuarioConectado(nombreUsuario);
+        }
+
     }
 
     public partial class ServicioImplementacion : IGestionPartida
@@ -697,18 +761,12 @@ namespace DobbleServicio
 
     public partial class ServicioImplementacion : IGestionCorreos
     {
-        public RespuestaServicio<bool> EnviarCodigo(string correo)
+        public RespuestaServicio<bool> EnviarCodigo(string correo, string codigo)
         {
             return GestorErrores.Ejecutar(() =>
             {
-                string codigo = GenerarCodigo();
                 return GestorCorreo.EnviarCorreo(correo, codigo);
             });
-        }
-
-        private string GenerarCodigo()
-        {
-            return new Random().Next(100000, 999999).ToString(); // Código de 6 dígitos
         }
     }
 }
