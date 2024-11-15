@@ -12,6 +12,15 @@ namespace Logica
     {
         public readonly object BloqueoPartida = new object();
         [DataMember]
-        public List<CuentaUsuario> CuentasEnPartida {  get; set; }
+        public List<Jugador> JugadoresEnPartida {  get; set; }
+        [DataMember]
+        public List<Carta> Cartas { get; set; }
+        public Carta CartaCentral { get; set; }
+
+        public Partida()
+        {
+            JugadoresEnPartida = new List<Jugador>();
+            Cartas = GeneradorCartas.ObtenerCartasRevueltas();
+        }
     }
 }

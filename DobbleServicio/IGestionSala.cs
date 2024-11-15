@@ -36,7 +36,7 @@ namespace DobbleServicio
         [OperationContract]
         bool ExisteSala(string codigoSala);
         [OperationContract(IsOneWay = true)]
-        void NotificarInstanciaVentanaPartida(string codigoSala);
+        void CambiarVentanaParaTodos(string codigoSala);
     }
 
     [ServiceContract]
@@ -45,12 +45,12 @@ namespace DobbleServicio
         [OperationContract(IsOneWay = true)]
         void MostrarMensajeSala(string mensaje);
         [OperationContract(IsOneWay = true)]
-        void ActualizarUsuariosConectados(List<CuentaUsuario> usuariosConectados);
+        void ActualizarUsuariosConectados(List<Jugador> usuariosConectados);
         [OperationContract(IsOneWay = true)]
         void ConvertirEnAnfitrion();
         [OperationContract(IsOneWay = true)]
         void NotificarExpulsionAJugador();
         [OperationContract(IsOneWay = true)]
-        void InstanciarVentanaPartida();
+        void CambiarVentana();
     }
 }

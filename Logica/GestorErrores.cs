@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity.Core;
+using System.Diagnostics;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -13,6 +14,11 @@ namespace Logica
     {
         public static RespuestaServicio<T> Ejecutar<T>(Func<T> accion)
         {
+            StackTrace stackTrace = new StackTrace();
+            var metodo = stackTrace.GetFrame(1).GetMethod();
+            string detallesLlamada = $"Método llamante: {metodo.DeclaringType?.FullName}.{metodo.Name}";
+            Registro.Informacion(detallesLlamada);
+
             var respuesta = new RespuestaServicio<T>
             {
                 Resultado = default,
@@ -44,6 +50,11 @@ namespace Logica
         {
             try
             {
+                StackTrace stackTrace = new StackTrace();
+                var metodo = stackTrace.GetFrame(1).GetMethod();
+                string detallesLlamada = $"Método llamante: {metodo.DeclaringType?.FullName}.{metodo.Name}";
+                Registro.Informacion(detallesLlamada);
+
                 return funcion();
             }
             catch (CommunicationException ex)
@@ -69,6 +80,11 @@ namespace Logica
         {
             try
             {
+                StackTrace stackTrace = new StackTrace();
+                var metodo = stackTrace.GetFrame(1).GetMethod();
+                string detallesLlamada = $"Método llamante: {metodo.DeclaringType?.FullName}.{metodo.Name}";
+                Registro.Informacion(detallesLlamada);
+
                 accion();
             }
             catch (CommunicationException ex)

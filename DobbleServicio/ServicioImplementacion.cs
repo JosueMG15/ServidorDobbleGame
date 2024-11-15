@@ -12,6 +12,7 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace DobbleServicio
 {
@@ -76,7 +77,7 @@ namespace DobbleServicio
         {
             foreach (var sala in salas.Values)
             {
-                if (sala.Usuarios.Any(u => u.Usuario == nombreUsuario))
+                if (sala.Jugadores.Any(u => u.Usuario == nombreUsuario))
                 {
                     AbandonarSala(nombreUsuario, sala.CodigoSala, mensaje);
                 }
@@ -158,20 +159,20 @@ namespace DobbleServicio
             {
                 lock (sala.BloqueoSala)
                 {
-                    CuentaUsuario cuentaUsuario = sala.Usuarios.FirstOrDefault(c => c.Usuario == nombreUsuario);
+                    Jugador cuentaUsuario = sala.Jugadores.FirstOrDefault(c => c.Usuario == nombreUsuario);
                     if (cuentaUsuario == null)
                     {
                         return false;
                     }
 
-                    if (sala.Usuarios.Count > 1)
+                    if (sala.Jugadores.Count > 1)
                     {
                         AsignarNuevoAnfitrion(sala, nombreUsuario);
                     }
 
-                    sala.Usuarios.Remove(cuentaUsuario);
+                    sala.Jugadores.Remove(cuentaUsuario);
 
-                    return sala.Usuarios.Count == 0 && salas.TryRemove(codigoSala, out _);
+                    return sala.Jugadores.Count == 0 && salas.TryRemove(codigoSala, out _);
                 }
             }, false);
 
@@ -193,15 +194,15 @@ namespace DobbleServicio
 
             bool resultado = GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
-                CuentaUsuario usuarioAExpulsar = sala.Usuarios.FirstOrDefault(u => u.Usuario == nombreUsuario);
+                Jugador usuarioAExpulsar = sala.Jugadores.FirstOrDefault(u => u.Usuario == nombreUsuario);
                 if (usuarioAExpulsar == null)
                 {
                     return false;
                 }
 
-                NotificarUsuario(usuarioAExpulsar, callback => callback.NotificarExpulsionAJugador());
+                NotificarUsuarioSala(usuarioAExpulsar, callback => callback.NotificarExpulsionAJugador());
 
-                sala.Usuarios.Remove(usuarioAExpulsar);
+                sala.Jugadores.Remove(usuarioAExpulsar);
                 return true;
             }, false);
 
@@ -218,16 +219,16 @@ namespace DobbleServicio
             {
                 GestorErrores.EjecutarConManejoDeExcepciones(() =>
                 {
-                    var cuentaActual = sala.Usuarios.FirstOrDefault(u => u.Usuario == usuarioActual && u.EsAnfitrion);
+                    var cuentaActual = sala.Jugadores.FirstOrDefault(u => u.Usuario == usuarioActual && u.EsAnfitrion);
                     if (cuentaActual != null)
                     {
                         cuentaActual.EsAnfitrion = false;
 
-                        var nuevoAnfitrion = sala.Usuarios.FirstOrDefault(u => u.Usuario != usuarioActual);
+                        var nuevoAnfitrion = sala.Jugadores.FirstOrDefault(u => u.Usuario != usuarioActual);
                         if (nuevoAnfitrion != null)
                         {
                             nuevoAnfitrion.EsAnfitrion = true;
-                            NotificarUsuario(nuevoAnfitrion, callback => callback.ConvertirEnAnfitrion());
+                            NotificarUsuarioSala(nuevoAnfitrion, callback => callback.ConvertirEnAnfitrion());
                         }
                     }
                 });
@@ -254,7 +255,7 @@ namespace DobbleServicio
             {
                 lock (sala.BloqueoSala)
                 {
-                    var usuarioEmisor = sala.Usuarios.FirstOrDefault(u => u.Usuario.Equals(nombreUsuario));
+                    var usuarioEmisor = sala.Jugadores.FirstOrDefault(u => u.Usuario.Equals(nombreUsuario));
                     string respuesta = usuarioEmisor != null ? $"{usuarioEmisor.Usuario}: {mensaje}" : string.Empty;
 
                     if (string.IsNullOrWhiteSpace(respuesta))
@@ -263,9 +264,9 @@ namespace DobbleServicio
                         return;
                     }
 
-                    foreach (var usuario in sala.Usuarios.ToList())
+                    foreach (var jugador in sala.Jugadores.ToList())
                     {
-                        NotificarUsuario(usuario, callback => callback.MostrarMensajeSala(respuesta));
+                        NotificarUsuarioSala(jugador, callback => callback.MostrarMensajeSala(respuesta));
                     }
                 }
             }
@@ -279,9 +280,9 @@ namespace DobbleServicio
                 {
                     string respuesta = $"{nombreUsuario} {mensaje}";
 
-                    foreach (var usuario in sala.Usuarios.ToList())
+                    foreach (var jugador in sala.Jugadores.ToList())
                     {
-                        NotificarUsuario(usuario, callback => callback.MostrarMensajeSala(respuesta));
+                        NotificarUsuarioSala(jugador, callback => callback.MostrarMensajeSala(respuesta));
                     }
                 }
             }
@@ -304,15 +305,22 @@ namespace DobbleServicio
             {
                 if (salas.TryGetValue(codigoSala, out Sala sala))
                 {
-                    cuentaUsuario.ContextoOperacion = OperationContext.Current;
-                    cuentaUsuario.EsAnfitrion = esAnfitrion;
+                    Jugador jugador = new Jugador()
+                    {
+                        Usuario = cuentaUsuario.Usuario,
+                        Foto = cuentaUsuario.Foto,
+                        Puntaje = cuentaUsuario.Puntaje,
+                        EsAnfitrion = esAnfitrion,
+                        ContextoOperacion = OperationContext.Current
+                    };
+
                     EnviarMensajeConexionSala(nombreUsuario, codigoSala, mensaje);
 
                     lock (sala.BloqueoSala)
                     {
-                        if (!sala.Usuarios.Contains(cuentaUsuario))
+                        if (!sala.Jugadores.Contains(jugador))
                         {
-                            sala.Usuarios.Add(cuentaUsuario);
+                            sala.Jugadores.Add(jugador);
                         }
                     }
 
@@ -330,9 +338,9 @@ namespace DobbleServicio
                 {
                     lock (sala.BloqueoSala)
                     {
-                        foreach (var usuario in sala.Usuarios.ToList())
+                        foreach (var jugador in sala.Jugadores.ToList())
                         {
-                            NotificarUsuario(usuario, callback => callback.ActualizarUsuariosConectados(sala.Usuarios));
+                            NotificarUsuarioSala(jugador, callback => callback.ActualizarUsuariosConectados(sala.Jugadores));
                         }
                     }
                 }
@@ -341,15 +349,15 @@ namespace DobbleServicio
 
         private void EnviarNotificacionUsuarios(Sala sala)
         {
-            var usuariosParaNotificar = sala.Usuarios.ToList();
+            var usuariosParaNotificar = sala.Jugadores.ToList();
 
-            foreach (var usuario in usuariosParaNotificar)
+            foreach (var jugador in usuariosParaNotificar)
             {
-                NotificarUsuario(usuario, callback => callback.ActualizarUsuariosConectados(sala.Usuarios));
+                NotificarUsuarioSala(jugador, callback => callback.ActualizarUsuariosConectados(sala.Jugadores));
             }
         }
 
-        public void NotificarInstanciaVentanaPartida(string codigoSala)
+        public void CambiarVentanaParaTodos(string codigoSala)
         {
             GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
@@ -357,22 +365,25 @@ namespace DobbleServicio
                 {
                     lock (sala.BloqueoSala)
                     {
-                        foreach (var usuario in sala.Usuarios.ToList())
+                        foreach (var jugador in sala.Jugadores.ToList())
                         {
-                            NotificarUsuario(usuario, callback => callback.InstanciarVentanaPartida());
+                            if (!jugador.EsAnfitrion)
+                            {
+                                NotificarUsuarioSala(jugador, callback => callback.CambiarVentana());
+                            }
                         }
                     }
                 }
             });
         }
 
-        private void NotificarUsuario(CuentaUsuario usuario, Action<ISalaCallback> accion)
+        private void NotificarUsuarioSala(Jugador jugador, Action<ISalaCallback> accion)
         {
             GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
-                if (usuario.ContextoOperacion != null)
+                if (jugador.ContextoOperacion != null)
                 {
-                    var callback = usuario.ContextoOperacion.GetCallbackChannel<ISalaCallback>();
+                    var callback = jugador.ContextoOperacion.GetCallbackChannel<ISalaCallback>();
                     if (((ICommunicationObject)callback).State == CommunicationState.Opened)
                     {
                         accion(callback);
@@ -537,58 +548,43 @@ namespace DobbleServicio
                 return false;
             }
 
-            if (salas.TryGetValue(codigoSala, out Sala sala))
+            return GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
-                ActualizarContexto(sala);
-
-                var partida = new Partida()
-                {
-                    CuentasEnPartida = sala.Usuarios,
-                };
-
-                return GestorErrores.EjecutarConManejoDeExcepciones(() =>
+                if (salas.TryGetValue(codigoSala, out Sala sala))
                 {
                     lock (sala.BloqueoSala)
                     {
+                        var partida = new Partida();
                         sala.PartidaSala = partida;
-                        return true;
                     }
-                }, false);
-            }
-
-            return false;
+                    return true;
+                }
+                return false;
+            }, false);
         }
 
-        private void ActualizarContexto(Sala sala)
+        public void UnirJugadorAPartida(string nombreUsuario, string codigoSala)
         {
-            foreach (var usuario in sala.Usuarios)
+            GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
-                usuario.ContextoOperacion = OperationContext.Current;
-            }
-        }
-
-        public void UnirJugadoresAPartida(string codigoSala)
-        {
-            if (salas.TryGetValue(codigoSala, out Sala sala))
-
-                lock (sala.PartidaSala.BloqueoPartida)
+                if (salas.TryGetValue(codigoSala, out Sala sala))
                 {
-                    /*GestorErrores.EjecutarConManejoDeExcepciones(()  =>
+                    if (sala.PartidaSala != null)
                     {
-                        foreach (var usuario in sala.PartidaSala.CuentasEnPartida.ToList())
+                        lock (sala.PartidaSala.BloqueoPartida)
                         {
-                            if (usuario.ContextoOperacion != null)
+                            var jugador = sala.Jugadores.FirstOrDefault(j => j.Usuario == nombreUsuario);
+                            if (jugador != null)
                             {
-                                var callback = usuario.ContextoOperacion.GetCallbackChannel<IPartidaCallback>();
-                                if (((ICommunicationObject)callback).State == CommunicationState.Opened)
-                                {
-                                    callback.CambiarVentanaAPartida();
-                                }
+                                jugador.ContextoOperacion = OperationContext.Current;
+                                sala.PartidaSala.JugadoresEnPartida.Add(jugador);
                             }
                         }
-                    });*/
+                    }
                 }
+            }); 
         }
+
         public bool AbandonarPartida(string nombreUsuario, string codigoSala)
         {
             if (salas.TryGetValue(codigoSala, out Sala sala))
@@ -597,12 +593,12 @@ namespace DobbleServicio
                 {
                     lock (sala.PartidaSala.BloqueoPartida)
                     {
-                        CuentaUsuario cuentaUsuario = sala.PartidaSala.CuentasEnPartida.FirstOrDefault(c => c.Usuario.Equals(nombreUsuario));
-                        if (cuentaUsuario == null) return false;
+                        Jugador jugador = sala.PartidaSala.JugadoresEnPartida.FirstOrDefault(c => c.Usuario.Equals(nombreUsuario));
+                        if (jugador == null) return false;
 
-                        sala.PartidaSala.CuentasEnPartida.Remove(cuentaUsuario);
+                        sala.PartidaSala.JugadoresEnPartida.Remove(jugador);
 
-                        if (sala.PartidaSala.CuentasEnPartida.Count == 0)
+                        if (sala.PartidaSala.JugadoresEnPartida.Count == 0)
                         {
                             sala.PartidaSala = null;
                         }
@@ -619,6 +615,49 @@ namespace DobbleServicio
             return false;
         }
 
+        public void NotificarInicioPartida(string codigoSala)
+        {
+            if (salas.TryGetValue(codigoSala, out Sala sala))
+            {
+                GestorErrores.EjecutarConManejoDeExcepciones(() =>
+                {
+                    Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
+                    {
+                        NotificarUsuarioPartida(jugador, callback => callback.IniciarPartida());
+                    });
+                });
+            }
+        }
+
+        public void NotificarDistribucionCartas(string codigoSala)
+        {
+            if (salas.TryGetValue(codigoSala, out Sala sala))
+            {
+                lock (sala.BloqueoSala)
+                {
+                    GestorErrores.EjecutarConManejoDeExcepciones(() =>
+                    {
+                        var cartas = sala.PartidaSala.Cartas.ToList();
+                        sala.PartidaSala.CartaCentral = cartas.First();
+
+                        foreach (var jugador in sala.PartidaSala.JugadoresEnPartida.ToList())
+                        {
+                            NotificarUsuarioPartida(jugador, callback => callback.AsignarCartaCentral(sala.PartidaSala.CartaCentral));
+                        }
+
+                        cartas.RemoveAt(0);
+                        
+                        foreach (var jugador in sala.PartidaSala.JugadoresEnPartida.ToList())
+                        {
+                            var carta = cartas.First();
+                            NotificarUsuarioPartida(jugador, callback => callback.AsignarCarta(carta));
+                            cartas.RemoveAt(0);
+                        }
+                    });
+                }
+            }
+        }
+
         public void NotificarActualizacionDeJugadoresEnPartida(string codigoSala)
         {
             if (salas.TryGetValue(codigoSala, out Sala sala))
@@ -627,20 +666,32 @@ namespace DobbleServicio
                 {
                     GestorErrores.EjecutarConManejoDeExcepciones(() =>
                     {
-                        foreach (var usuario in sala.PartidaSala.CuentasEnPartida.ToList())
+                        foreach (var jugador in sala.PartidaSala.JugadoresEnPartida.ToList())
                         {
-                            if (usuario.ContextoOperacion != null)
+                            if (jugador.ContextoOperacion != null)
                             {
-                                var callback = usuario.ContextoOperacion.GetCallbackChannel<IPartidaCallback>();
-                                if (((ICommunicationObject)callback).State == CommunicationState.Opened)
-                                {
-                                    callback.ActualizarJugadoresEnPartida(sala.PartidaSala.CuentasEnPartida);
-                                }
+                                NotificarUsuarioPartida(jugador, callback => 
+                                callback.ActualizarJugadoresEnPartida(sala.PartidaSala.JugadoresEnPartida));
                             }
                         }
                     });
                 }
             }
+        }
+
+        private void NotificarUsuarioPartida(Jugador jugador, Action<IPartidaCallback> accion)
+        {
+            GestorErrores.EjecutarConManejoDeExcepciones(() =>
+            {
+                if (jugador.ContextoOperacion != null)
+                {
+                    var callback = jugador.ContextoOperacion.GetCallbackChannel<IPartidaCallback>();
+                    if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                    {
+                        accion(callback);
+                    }
+                }
+            });
         }
     }
 
