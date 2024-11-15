@@ -29,7 +29,7 @@ namespace DobbleServicio
         RespuestaServicio<bool> AceptarSolicitud(int idAmistad, String nombreUsuarioAmigo);
 
         [OperationContract]
-        RespuestaServicio<bool> EliminarAmistad(int idAmistad, String nombreUsuarioAmigo);
+        RespuestaServicio<bool> EliminarAmistad(int idAmistad, String nombreUsuario, String nombreUsuarioAmigo);
 
         [OperationContract]
         RespuestaServicio<List<Amistad>> ObtenerAmistades(int idUsuario);
@@ -39,5 +39,14 @@ namespace DobbleServicio
 
         [OperationContract]
         RespuestaServicio<Amistad> ObtenerSolicitud();
+
+        [OperationContract]
+        void AgregarUsuario(string nombreUsuario);
+
+        [OperationContract]
+        void QuitarUsuario(string nombreUsuario);
+
+        [OperationContract]
+        bool ObtenerUsuarioConectado(String nombreUsuario);
     }
 }

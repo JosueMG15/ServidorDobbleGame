@@ -162,6 +162,7 @@ namespace Logica
             }
         }
 
+
         public static List<Logica.Amistad> ObtenerAmistades(int idUsuario)
         {
             using (var contexto = new DobbleBDEntidades())
@@ -241,6 +242,5 @@ namespace Logica
                 return amistadLogica;
             }
         }
-
     }
 }

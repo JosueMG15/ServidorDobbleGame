@@ -14,6 +14,6 @@ namespace DobbleServicio
     public interface IGestionCorreos
     {
         [OperationContract]
-        RespuestaServicio<bool> EnviarCodigo(string correo);
+        RespuestaServicio<bool> EnviarCodigo(string correo, string codigo);
     }
 }

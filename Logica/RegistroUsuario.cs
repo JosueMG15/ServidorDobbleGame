@@ -100,5 +100,30 @@ namespace Logica
             
             return cuentaUsuario;
         }
+
+        public static CuentaUsuario ObtenerUsuarioPorCorreo(string correo)
+        {
+            CuentaUsuario cuentaUsuario = null;
+            using (var contexto = new DobbleBDEntidades())
+            {
+                var consulta = (from cuenta in contexto.Cuenta
+                                join usuario in contexto.Usuario
+                                on cuenta.idCuenta equals usuario.idCuenta
+                                where cuenta.correo == correo
+                                select new CuentaUsuario
+                                {
+                                    IdCuentaUsuario = cuenta.idCuenta,
+                                    Usuario = cuenta.nombreUsuario,
+                                    Correo = cuenta.correo,
+                                    Contraseña = cuenta.contraseña,
+                                    Foto = usuario.foto,
+                                    Puntaje = usuario.puntaje.Value,
+                                }).Take(1);
+
+                cuentaUsuario = consulta.FirstOrDefault();
+            }
+
+            return cuentaUsuario;
+        }
     }
 }

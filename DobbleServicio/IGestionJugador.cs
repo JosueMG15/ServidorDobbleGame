@@ -22,6 +22,7 @@ namespace DobbleServicio
 
         [OperationContract]
         RespuestaServicio<CuentaUsuario> IniciarSesionJugador(string nombreUsuario, string contraseña);
+
         [OperationContract(IsOneWay = true)]
         void CerrarSesionJugador(string nombreUsuario, string mensaje);
 
@@ -36,5 +37,8 @@ namespace DobbleServicio
 
         [OperationContract]
         RespuestaServicio<bool> ValidarContraseña(int idCuenta, String contraseñaUsuario);
+
+        [OperationContract]
+        RespuestaServicio<CuentaUsuario> ObtenerUsuarioPorCorreo(string correo);
     }   
 }
