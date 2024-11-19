@@ -13,6 +13,7 @@ namespace Logica
         [DataMember]
         public List<Icono> Iconos { get; private set; }
         
+        public Carta() { }
         public Carta(List<Icono> iconos)
         {
             Iconos = iconos;

@@ -26,12 +26,6 @@ namespace Logica
         public int Puntaje { get; set; }
         [DataMember]
         public bool Estado {  get; set; }
-        [DataMember]
-        public bool EsAnfitrion {  get; set; }
-        [DataMember]
-        public int PuntosEnPartida { get; set; }
-        [DataMember]
-        public int NumeroJugador { get; set; }
         public OperationContext ContextoOperacion { get; set; }
         
     }

@@ -15,6 +15,7 @@ namespace Logica
         public const int MAXIMO_JUGADORES = 4;
         public readonly object BloqueoSala = new object();
         public string CodigoSala { get; set; }
+        public bool Disponible {  get; set; }
         public List<Jugador> Jugadores { get; set; }
         public Partida PartidaSala { get; set; }
 
@@ -22,6 +23,7 @@ namespace Logica
         {
             Jugadores = new List<Jugador>();
             CodigoSala = codigoSala;
+            Disponible = true;
         }
 
         public bool HayEspacioEnSala()

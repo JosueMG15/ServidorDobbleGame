@@ -35,6 +35,8 @@ namespace DobbleServicio
         bool HayEspacioSala(string codigoSala);
         [OperationContract]
         bool ExisteSala(string codigoSala);
+        [OperationContract]
+        bool EsSalaDisponible(string codigoSala);
         [OperationContract(IsOneWay = true)]
         void CambiarVentanaParaTodos(string codigoSala);
     }

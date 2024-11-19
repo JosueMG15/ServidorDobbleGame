@@ -425,6 +425,11 @@ namespace DobbleServicio
             return salas.ContainsKey(codigoSala);
         }
 
+        public bool EsSalaDisponible(string codigoSala)
+        {
+            return salas.TryGetValue(codigoSala, out Sala sala) && sala.Disponible;
+        }
+
     }
 
     public partial class ServicioImplementacion : IGestionAmigos, IGestionNotificacionesAmigos
@@ -620,6 +625,7 @@ namespace DobbleServicio
                     {
                         var partida = new Partida();
                         sala.PartidaSala = partida;
+                        sala.Disponible = false;
                     }
                     return true;
                 }
@@ -642,6 +648,7 @@ namespace DobbleServicio
                             {
                                 jugador.ContextoOperacion = OperationContext.Current;
                                 sala.PartidaSala.JugadoresEnPartida.Add(jugador);
+                                sala.Jugadores.Remove(jugador);
                             }
                         }
                     }
@@ -661,10 +668,11 @@ namespace DobbleServicio
                         if (jugador == null) return false;
 
                         sala.PartidaSala.JugadoresEnPartida.Remove(jugador);
+                        sala.Jugadores.Remove(jugador);
 
                         if (sala.PartidaSala.JugadoresEnPartida.Count == 0)
                         {
-                            sala.PartidaSala = null;
+                            salas.TryRemove(codigoSala, out _);
                         }
                         else
                         {
@@ -701,25 +709,88 @@ namespace DobbleServicio
                 {
                     GestorErrores.EjecutarConManejoDeExcepciones(() =>
                     {
-                        var cartas = sala.PartidaSala.Cartas.ToList();
-                        sala.PartidaSala.CartaCentral = cartas.First();
+                        var cartas = sala.PartidaSala.Cartas;
+                        sala.PartidaSala.CartaCentral = cartas.Dequeue();
 
-                        foreach (var jugador in sala.PartidaSala.JugadoresEnPartida.ToList())
-                        {
-                            NotificarUsuarioPartida(jugador, callback => callback.AsignarCartaCentral(sala.PartidaSala.CartaCentral));
-                        }
-
-                        cartas.RemoveAt(0);
+                        AsignarCartaCentral(sala, sala.PartidaSala.CartaCentral);
                         
                         foreach (var jugador in sala.PartidaSala.JugadoresEnPartida.ToList())
                         {
-                            var carta = cartas.First();
-                            NotificarUsuarioPartida(jugador, callback => callback.AsignarCarta(carta));
-                            cartas.RemoveAt(0);
+                            var carta = cartas.Dequeue();
+                            AsignarCartaJugador(jugador, carta);
                         }
                     });
                 }
             }
+        }
+
+        private void AsignarCartaCentral(Sala sala, Carta cartaCentral)
+        {
+            sala.PartidaSala.CartaCentral = cartaCentral;   
+            Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
+            {
+                NotificarUsuarioPartida(jugador, callback =>
+                callback.AsignarCartaCentral(cartaCentral));
+            });
+        }
+
+        private void AsignarCartaJugador(Jugador jugador, Carta carta)
+        {
+            NotificarUsuarioPartida(jugador, callback => callback.AsignarCarta(carta));
+        }
+
+        public void ValidarCarta(string nombreUsuario, string rutaIcono, string codigoSala)
+        {
+            if (salas.TryGetValue(codigoSala, out Sala sala))
+            {
+                lock (sala.BloqueoSala)
+                {
+                    GestorErrores.EjecutarConManejoDeExcepciones(() =>
+                    {
+                        Carta cartaCentral = sala.PartidaSala.CartaCentral;
+                        Jugador jugador = sala.PartidaSala.JugadoresEnPartida.FirstOrDefault(j => j.Usuario == nombreUsuario);
+
+                        if (cartaCentral.Iconos.Any(i => i.Ruta == rutaIcono))
+                        {
+                            jugador.PuntosEnPartida++;
+                            NotificarActualizacionDePuntosEnPartida(jugador.Usuario, jugador.PuntosEnPartida, sala);
+                            AsignarCartaJugador(jugador, cartaCentral);
+                            
+                            if (sala.PartidaSala.Cartas.Any())
+                            {
+                                AsignarCartaCentral(sala, sala.PartidaSala.Cartas.Dequeue());
+                            }
+                            else
+                            {
+                                NotificarFinDePartida(sala);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        private void NotificarActualizacionDePuntosEnPartida(string nombreUsuario, int puntosEnPartida, Sala sala)
+        {
+            GestorErrores.EjecutarConManejoDeExcepciones(() =>
+            {
+                Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
+                {
+                    NotificarUsuarioPartida(jugador, callback =>
+                    callback.ActualizarPuntosEnPartida(nombreUsuario, puntosEnPartida));
+                });
+            });
+        }
+
+        private void NotificarFinDePartida(Sala sala)
+        {
+            GestorErrores.EjecutarConManejoDeExcepciones(() =>
+            {
+                Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
+                {
+                    NotificarUsuarioPartida(jugador, callback => callback.FinalizarPartida());
+                });
+            });
         }
 
         public void NotificarActualizacionDeJugadoresEnPartida(string codigoSala)
@@ -730,14 +801,11 @@ namespace DobbleServicio
                 {
                     GestorErrores.EjecutarConManejoDeExcepciones(() =>
                     {
-                        foreach (var jugador in sala.PartidaSala.JugadoresEnPartida.ToList())
+                        Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
                         {
-                            if (jugador.ContextoOperacion != null)
-                            {
-                                NotificarUsuarioPartida(jugador, callback => 
-                                callback.ActualizarJugadoresEnPartida(sala.PartidaSala.JugadoresEnPartida));
-                            }
-                        }
+                            NotificarUsuarioPartida(jugador, callback => 
+                            callback.ActualizarJugadoresEnPartida(sala.PartidaSala.JugadoresEnPartida));
+                        });
                     });
                 }
             }

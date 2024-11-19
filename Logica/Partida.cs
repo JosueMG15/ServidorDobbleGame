@@ -14,13 +14,13 @@ namespace Logica
         [DataMember]
         public List<Jugador> JugadoresEnPartida {  get; set; }
         [DataMember]
-        public List<Carta> Cartas { get; set; }
+        public Queue<Carta> Cartas { get; set; }
         public Carta CartaCentral { get; set; }
 
         public Partida()
         {
             JugadoresEnPartida = new List<Jugador>();
-            Cartas = GeneradorCartas.ObtenerCartasRevueltas();
+            Cartas = new Queue<Carta>(GeneradorCartas.ObtenerCartasRevueltas());
         }
     }
 }

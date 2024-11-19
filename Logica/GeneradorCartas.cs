@@ -8,10 +8,10 @@ namespace Logica
 {
     public class GeneradorCartas
     {
-        private static Random random = new Random();
-        private const int TAMAÑO = 7;
-        private static int numSimbolosPorCarta = TAMAÑO + 1;
-        private static int totalCartas = TAMAÑO * TAMAÑO + TAMAÑO + 1;
+        private readonly static int semilla = (int)DateTime.Now.Ticks;
+        private readonly static Random random = new Random(semilla);
+        private const int TAMAÑO = 2;
+        private readonly static int numSimbolosPorCarta = TAMAÑO + 1;
 
         private static List<Icono> InicializarIconos()
         {
@@ -79,59 +79,89 @@ namespace Logica
             return iconos;
         }
 
-        private static List<Carta> GenerarCartas()
+        private static List<List<int>> AlgoritmoDobble()
         {
-            List<Carta> cartas = new List<Carta>();
-            List<Icono> iconos = InicializarIconos();
+            List<List<int>> cartas = new List<List<int>>();
+            
 
-            for (int i = 0; i < numSimbolosPorCarta; i++)
+            for (int i = 0; i <= TAMAÑO; i++)
             {
-                List<Icono> iconosCarta = new List<Icono>
-                {
-                    iconos[0]
-                };
+                List<int> carta = new List<int> { 1 };
 
-                for (int j = 0; j < TAMAÑO; j++)
+                for (int j = 1; j <= TAMAÑO; j++)
                 {
-                    iconosCarta.Add(iconos[j + 1 + i + TAMAÑO]);
+                    int indice = TAMAÑO + TAMAÑO * (i - 1) + (j + 1);
+                    carta.Add(indice);
                 }
-                cartas.Add(new Carta(iconosCarta));
+                cartas.Add(carta);
             }
 
-            for (int i = 0; i < TAMAÑO; i++)
+            for (int i = 1; i <= TAMAÑO; i++)
             {
-                for (int j = 0; j < TAMAÑO; j++)
+                for (int j = 1; j <= TAMAÑO; j++)
                 {
-                    List<Icono> iconosCarta = new List<Icono>
+                    List<int> carta = new List<int> { i + 1 };
+                    for (int k = 1; k <= TAMAÑO; k++)
                     {
-                        iconos[i + 1]
-                    };
-                    
-                    for (int k = 0; k < TAMAÑO; k++)
-                    {
-                        iconosCarta.Add(iconos[(TAMAÑO + 1 + TAMAÑO * k + (i * k + j) % TAMAÑO)]);
+                        int indice = (numSimbolosPorCarta + 1) + TAMAÑO * (k - 1)
+                            + (((i - 1) * (k - 1) + (j - 1))) % TAMAÑO;
+                        carta.Add(indice);
                     }
-                    cartas.Add(new Carta(iconosCarta));
+                    cartas.Add(carta);
                 }
             }
 
             return cartas;
         }
 
-        public static List<Carta> ObtenerCartasRevueltas()
+        private static void Revolver<T>(List<T> lista)
         {
-            List<Carta> cartasRevueltas = GenerarCartas();
-            int numCartas = cartasRevueltas.Count;
-
-            for (int i = numCartas - 1; i > 0; i--)
+            int numeroIconos = lista.Count;
+            while (numeroIconos > 1)
             {
-                int j = random.Next(0, i + 1);
-                var temporal = cartasRevueltas[i];
-                cartasRevueltas[i] = cartasRevueltas[j];
-                cartasRevueltas[j] = temporal;
+                numeroIconos--;
+                int i = random.Next(numeroIconos + 1);
+                T icono = lista[i];
+                lista[i] = lista[numeroIconos];
+                lista[numeroIconos] = icono;
+            }
+        }
+
+        private static List<Carta> GenerarCartasDobble()
+        {
+            List<List<int>> cartasAlgoritmo = AlgoritmoDobble();
+            List<Carta> cartasDobble = new List<Carta>();
+            List<Icono> iconos = InicializarIconos();
+            int numeroCarta = 1;
+
+            foreach (var cartaAlgoritmo in cartasAlgoritmo)
+            {
+                Revolver(cartaAlgoritmo);
+                List<Icono> cartaDobble = new List<Icono>();
+                Console.WriteLine($"Carta {numeroCarta}:");
+                foreach (var icono in cartaAlgoritmo)
+                {
+                    // Puedes imprimir la ruta del icono o un nombre representativo
+                    if (icono <= iconos.Count)
+                    {
+                        Console.WriteLine($"- {iconos[icono - 1].Ruta}");
+                        cartaDobble.Add(iconos[icono - 1]);
+                    }
+                }
+                Console.WriteLine(); // Espacio entre cartas
+                cartasDobble.Add(new Carta(cartaDobble));
+                numeroCarta++;
             }
 
-            return cartasRevueltas;
+            return cartasDobble;
+        }
+
+        public static List<Carta> ObtenerCartasRevueltas()
+        {
+            List<Carta> cartasDobble = GenerarCartasDobble();
+            Revolver(cartasDobble);
+
+            return cartasDobble;
         }
     }
 }

@@ -23,6 +23,8 @@ namespace DobbleServicio
         void NotificarInicioPartida(string codigoSala);
         [OperationContract(IsOneWay = true)]
         void NotificarDistribucionCartas (string codigoSala);
+        [OperationContract(IsOneWay = true)]
+        void ValidarCarta(string nombreUsuario, string rutaIcono, string codigoSala);
     }
 
     [ServiceContract]
@@ -33,8 +35,12 @@ namespace DobbleServicio
         [OperationContract(IsOneWay = true)]
         void IniciarPartida();
         [OperationContract(IsOneWay = true)]
+        void FinalizarPartida();
+        [OperationContract(IsOneWay = true)]
         void AsignarCarta(Carta carta);
         [OperationContract (IsOneWay = true)]
         void AsignarCartaCentral(Carta cartaCentral);
+        [OperationContract(IsOneWay = true)]
+        void ActualizarPuntosEnPartida(string nombreUsuario, int puntosEnPartida);
     }
 }
