@@ -242,5 +242,6 @@ namespace Logica
                 return amistadLogica;
             }
         }
+
     }
 }

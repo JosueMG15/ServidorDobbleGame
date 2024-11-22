@@ -10,7 +10,7 @@ namespace Logica
     {
         private readonly static int semilla = (int)DateTime.Now.Ticks;
         private readonly static Random random = new Random(semilla);
-        private const int TAMAÑO = 2;
+        private const int TAMAÑO = 7;
         private readonly static int numSimbolosPorCarta = TAMAÑO + 1;
 
         private static List<Icono> InicializarIconos()

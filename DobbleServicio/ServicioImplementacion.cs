@@ -93,7 +93,7 @@ namespace DobbleServicio
             }
         }
 
-        public RespuestaServicio<bool> ModificarNombreUsuario(int idUsuario, String nombreUsuario)
+        /*public RespuestaServicio<bool> ModificarNombreUsuario(int idUsuario, String nombreUsuario)
         {
             return GestorErrores.Ejecutar(() =>
             {
@@ -115,7 +115,48 @@ namespace DobbleServicio
 
                 return exito;
             });
+        }*/
+        public RespuestaServicio<bool> ModificarNombreUsuario(int idUsuario, string nombreUsuario)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                bool exito = ModificarUsuario.ModificarNombreUsuario(idUsuario, nombreUsuario);
+
+                var cuentaUsuario = UsuariosActivos.Values.FirstOrDefault(c => c.IdCuentaUsuario == idUsuario);
+
+                if (exito && cuentaUsuario != null)
+                {
+                    // Actualizar la información del usuario
+                    string nombreUsuarioAntiguo = cuentaUsuario.Usuario;
+                    cuentaUsuario.Usuario = nombreUsuario;
+
+                    // Actualizar el diccionario UsuariosActivos
+                    UsuariosActivos.TryRemove(nombreUsuarioAntiguo, out _); // Elimina la entrada vieja
+                    UsuariosActivos.AddOrUpdate(nombreUsuario, cuentaUsuario, (key, oldValue) => cuentaUsuario);
+
+                    // Actualizar el diccionario clientesConectados
+                    if (clientesConectados.TryRemove(nombreUsuarioAntiguo, out var callback))
+                    {
+                        clientesConectados.TryAdd(nombreUsuario, callback); // Añadir el cliente con el nuevo nombre
+                    }
+
+                    foreach (var cliente in clientesConectados.Values)
+                    {
+                        try
+                        {
+                            cliente.NotificarCambio();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error al notificar al cliente: {ex.Message}");
+                        }
+                    }
+                }
+
+                return exito;
+            });
         }
+
 
         public RespuestaServicio<bool> ModificarContraseñaUsuario(int idUsuario, String contraseñaUsuario)
         {
@@ -564,7 +605,6 @@ namespace DobbleServicio
             });
         }
 
-
         // Método para conectar un cliente y registrar su callback
         public void ConectarCliente(string nombreUsuario)
         {
@@ -572,40 +612,37 @@ namespace DobbleServicio
             clientesConectados.TryAdd(nombreUsuario, callback);
         }
 
+
         // Método para desconectar un cliente y eliminar su callback
         public void DesconectarCliente(string nombreUsuario)
         {
             clientesConectados.TryRemove(nombreUsuario, out _);
         }
 
-
-        //LISTA LOCAL DE USUARIOS CONECTADOS
-        public void AgregarUsuario(string nombreUsuario)
+        public RespuestaServicio<bool> UsuarioConectado(string nombreUsuario)
         {
-            UsuariosConectados.AgregarUsuario(nombreUsuario);
+            return GestorErrores.Ejecutar(() =>
+            {
+                return clientesConectados.ContainsKey(nombreUsuario);
+            });
+        }
+
+
+        public void NotificarCambios()
+        {
             foreach (var cliente in clientesConectados.Values)
             {
                 cliente.NotificarCambio();
             }
         }
 
-        public void QuitarUsuario(string nombreUsuario)
+        public void NotificarDesconexion(string nombreUsuario)
         {
-            UsuariosConectados.QuitarUsuario(nombreUsuario);
-            foreach (var kvp in clientesConectados)
+            foreach (var cliente in clientesConectados.Values)
             {
-                if (kvp.Key != nombreUsuario)
-                {
-                    kvp.Value.NotificarCambio();
-                }
+                cliente.NotificarSalida(nombreUsuario);
             }
         }
-
-        public bool ObtenerUsuarioConectado(string nombreUsuario)
-        {
-            return UsuariosConectados.ObtenerUsuarioConectado(nombreUsuario);
-        }
-
     }
 
     public partial class ServicioImplementacion : IGestionPartida
