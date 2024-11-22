@@ -370,16 +370,6 @@ namespace DobbleServicio
             });
         }
 
-        private void EnviarNotificacionUsuarios(Sala sala)
-        {
-            var usuariosParaNotificar = sala.Jugadores.ToList();
-
-            foreach (var jugador in usuariosParaNotificar)
-            {
-                NotificarUsuarioSala(jugador, callback => callback.ActualizarUsuariosConectados(sala.Jugadores));
-            }
-        }
-
         public void CambiarVentanaParaTodos(string codigoSala)
         {
             GestorErrores.EjecutarConManejoDeExcepciones(() =>
@@ -667,6 +657,8 @@ namespace DobbleServicio
                         Jugador jugador = sala.PartidaSala.JugadoresEnPartida.FirstOrDefault(c => c.Usuario.Equals(nombreUsuario));
                         if (jugador == null) return false;
 
+                        bool esAnfitrion = jugador.EsAnfitrion;
+
                         sala.PartidaSala.JugadoresEnPartida.Remove(jugador);
                         sala.Jugadores.Remove(jugador);
 
@@ -676,6 +668,11 @@ namespace DobbleServicio
                         }
                         else
                         {
+                            if (esAnfitrion)
+                            {
+                                AsignarNuevoAnfitrionDesdePartida(sala, jugador.Usuario);
+                            }
+
                             NotificarActualizacionDeJugadoresEnPartida(codigoSala);
                         }
 
@@ -685,6 +682,22 @@ namespace DobbleServicio
             }
 
             return false;
+        }
+
+        private void AsignarNuevoAnfitrionDesdePartida(Sala sala, string usuarioActual)
+        {
+            lock (sala.BloqueoSala)
+            {
+                GestorErrores.EjecutarConManejoDeExcepciones(() =>
+                {
+                    var nuevoAnfitrion = sala.PartidaSala.JugadoresEnPartida.FirstOrDefault(u => u.Usuario != usuarioActual);
+                        if (nuevoAnfitrion != null)
+                        {
+                            nuevoAnfitrion.EsAnfitrion = true;
+                            NotificarUsuarioPartida(nuevoAnfitrion, callback => callback.ConvertirEnAnfitrionDesdePartida());
+                        }
+                });
+            }
         }
 
         public void NotificarInicioPartida(string codigoSala)
@@ -729,8 +742,10 @@ namespace DobbleServicio
             sala.PartidaSala.CartaCentral = cartaCentral;   
             Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
             {
+                jugador.CartaBloqueada = false;
                 NotificarUsuarioPartida(jugador, callback =>
-                callback.AsignarCartaCentral(cartaCentral));
+                    callback.AsignarCartaCentral(cartaCentral));
+                NotificarUsuarioPartida(jugador, callback => callback.DesbloquearCarta());
             });
         }
 
@@ -765,9 +780,31 @@ namespace DobbleServicio
                                 NotificarFinDePartida(sala);
                             }
                         }
+                        else
+                        {
+                            jugador.CartaBloqueada = true;
+                            NotificarUsuarioPartida(jugador, callback => callback.BloquearCarta());
+
+                            if (TodosTienenCartaBloqueada(sala.PartidaSala.JugadoresEnPartida))
+                            {
+                                if (sala.PartidaSala.Cartas.Any())
+                                {
+                                    AsignarCartaCentral(sala, sala.PartidaSala.Cartas.Dequeue());
+                                }
+                                else
+                                {
+                                    NotificarFinDePartida(sala);
+                                }
+                            }
+                        }
                     });
                 }
             }
+        }
+
+        private bool TodosTienenCartaBloqueada(List<Jugador> jugadores)
+        {
+            return jugadores.All(jugador => jugador.CartaBloqueada);
         }
 
         private void NotificarActualizacionDePuntosEnPartida(string nombreUsuario, int puntosEnPartida, Sala sala)
@@ -777,7 +814,7 @@ namespace DobbleServicio
                 Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
                 {
                     NotificarUsuarioPartida(jugador, callback =>
-                    callback.ActualizarPuntosEnPartida(nombreUsuario, puntosEnPartida));
+                        callback.ActualizarPuntosEnPartida(nombreUsuario, puntosEnPartida));
                 });
             });
         }
@@ -786,6 +823,7 @@ namespace DobbleServicio
         {
             GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
+                sala.Disponible = true;
                 Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
                 {
                     NotificarUsuarioPartida(jugador, callback => callback.FinalizarPartida());
@@ -804,7 +842,7 @@ namespace DobbleServicio
                         Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
                         {
                             NotificarUsuarioPartida(jugador, callback => 
-                            callback.ActualizarJugadoresEnPartida(sala.PartidaSala.JugadoresEnPartida));
+                                callback.ActualizarJugadoresEnPartida(sala.PartidaSala.JugadoresEnPartida));
                         });
                     });
                 }
