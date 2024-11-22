@@ -41,12 +41,12 @@ namespace DobbleServicio
         RespuestaServicio<Amistad> ObtenerSolicitud();
 
         [OperationContract]
-        void AgregarUsuario(string nombreUsuario);
+        RespuestaServicio<bool> UsuarioConectado(string nombreUsuario);
 
         [OperationContract]
-        void QuitarUsuario(string nombreUsuario);
+        void NotificarCambios();
 
         [OperationContract]
-        bool ObtenerUsuarioConectado(String nombreUsuario);
+        void NotificarDesconexion(string nombreUsuario);
     }
 }
