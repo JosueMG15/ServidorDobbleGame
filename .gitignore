@@ -365,3 +365,7 @@ FodyWeavers.xsd
 /DobbleServicio/ServicioImplementacion.cs
 /Host/Registros/RegistrosServidor.txt
 /.sonarqube/conf
+/DataAccess/CadenaDeConexion.config
+/Host/CadenaDeConexion.config
+/Logica/CadenaDeConexion.config
+/Pruebas/CadenaDeConexion.config
