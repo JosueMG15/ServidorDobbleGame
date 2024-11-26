@@ -629,13 +629,19 @@ namespace DobbleServicio
             }
         }
 
-        public void NotificarVentanaInvitacion(string nombreUsuario)
+        public void NotificarBotonInvitacion(string nombreUsuario)
         {
-            // Verifica si el destinatario está conectado y tiene un callback disponible
+            foreach (var cliente in clientesConectados.Values)
+            {
+                cliente.NotificarInvitacionActiva(nombreUsuario);
+            }
+        }
+
+        public void NotificarInvitacion(string nombreUsuario, string nombreUsuarioInvitacion)
+        {
             if (clientesConectados.TryGetValue(nombreUsuario, out var callback))
             {
-                // Llama al método de callback para notificar al destinatario
-                callback.NotificarSolicitudAmistad();
+                callback.NotificarVentanaInvitacion(nombreUsuarioInvitacion);
             }
         }
     }

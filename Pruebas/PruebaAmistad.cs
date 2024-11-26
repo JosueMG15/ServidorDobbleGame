@@ -38,7 +38,6 @@ namespace Pruebas
         [TestMethod]
         public void EnviarSolicitudAmistad_Exitosa()
         {
-            // Se asegura quer no hay solicitudes previas
             var solicitudesPrevias = contexto.Amistad
                 .Where(a => a.UsuarioPrincipalId == idUsuarioPrincipal && a.UsuarioAmigoId == idUsuarioAmigo)
                 .ToList();
@@ -52,7 +51,6 @@ namespace Pruebas
 
             Assert.IsTrue(resultado, "La solicitud de amistad no fue enviada correctamente.");
 
-            // Limpieza después de la prueba
             var nuevaSolicitud = contexto.Amistad
                 .FirstOrDefault(a => a.UsuarioPrincipalId == idUsuarioPrincipal && a.UsuarioAmigoId == idUsuarioAmigo);
             if (nuevaSolicitud != null)
@@ -76,12 +74,11 @@ namespace Pruebas
         [TestMethod]
         public void AmistadYaExiste_Exitoso()
         {
-            // Crear una amistad existente entre los usuarios
             var amistadExistente = new DataAccess.Amistad
             {
                 UsuarioPrincipalId = idUsuarioPrincipal,
                 UsuarioAmigoId = idUsuarioAmigo,
-                estadoSolicitud = true // Estado de amistad confirmada
+                estadoSolicitud = true 
             };
             contexto.Amistad.Add(amistadExistente);
             contexto.SaveChanges();
@@ -90,7 +87,6 @@ namespace Pruebas
 
             Assert.IsTrue(resultado, "El método no detectó una amistad existente.");
 
-            // Limpiar después de la prueba
             contexto.Amistad.Remove(amistadExistente);
             contexto.SaveChanges();
         }
@@ -98,7 +94,6 @@ namespace Pruebas
         [TestMethod]
         public void AmistadYaExiste_AmistadNoExistente()
         {
-            // Asegurarse de que no haya amistad previa
             var amistadesPrevias = contexto.Amistad
                 .Where(a => (a.UsuarioPrincipalId == idUsuarioPrincipal && a.UsuarioAmigoId == idUsuarioAmigo) ||
                             (a.UsuarioPrincipalId == idUsuarioAmigo && a.UsuarioAmigoId == idUsuarioPrincipal))
@@ -132,7 +127,7 @@ namespace Pruebas
             {
                 UsuarioPrincipalId = 23,
                 UsuarioAmigoId = 27,
-                estadoSolicitud = false // Solicitud pendiente
+                estadoSolicitud = false 
             };
             contexto.Amistad.Add(nuevaSolicitud);
             contexto.SaveChanges();
@@ -143,7 +138,6 @@ namespace Pruebas
             Assert.IsTrue(solicitudes.Any(s => s.UsuarioPrincipalId == 23 && s.UsuarioAmigoId == usuarioAmigoId),
                           "El método no devolvió las solicitudes pendientes esperadas.");
 
-            // Limpiar después de la prueba
             contexto.Amistad.Remove(nuevaSolicitud);
             contexto.SaveChanges();
         }
@@ -151,7 +145,6 @@ namespace Pruebas
         [TestMethod]
         public void ObtenerSolicitudesPendientes_SinSolicitudesPendientes()
         {
-            // Asegurarse de que no haya solicitudes pendientes para el usuario
             var solicitudesPendientes = contexto.Amistad
                 .Where(a => a.UsuarioAmigoId == idUsuarioAmigo && a.estadoSolicitud == false)
                 .ToList();
@@ -208,7 +201,6 @@ namespace Pruebas
             var usuarioOriginal = contexto.Cuenta.FirstOrDefault(c => c.idCuenta == idUsuarioExistente);
             Assert.IsNotNull(usuarioOriginal, "El usuario original no debería ser nulo para la prueba.");
 
-            // Guardar datos originales
             string nombreOriginal = usuarioOriginal.nombreUsuario;
             string correoOriginal = usuarioOriginal.correo;
             string contraseñaOriginal = usuarioOriginal.contraseña;
@@ -224,13 +216,10 @@ namespace Pruebas
         [TestMethod]
         public void ObtenerUsuarioPorNombre_Exitoso()
         {
-            // Nombre de usuario que se sabe que existe en la base de datos
             string nombreUsuario = "paput";
 
-            // Llamar al método
             var resultado = GestorAmistad.ObtenerUsuarioPorNombre(nombreUsuario);
 
-            // Verificar que el resultado no es nulo y contiene datos
             Assert.IsNotNull(resultado, "El método debería devolver un usuario cuando el nombre existe.");
             Assert.AreEqual(nombreUsuario, resultado.Usuario, "El nombre de usuario en el resultado debería coincidir con el buscado.");
         }
@@ -238,23 +227,18 @@ namespace Pruebas
         [TestMethod]
         public void ObtenerUsuarioPorNombre_UsuarioNoExiste()
         {
-            // Nombre de usuario que se sabe que no existe en la base de datos
             string nombreUsuario = "q23tjhfbrfwfv";
 
-            // Llamar al método
             var resultado = GestorAmistad.ObtenerUsuarioPorNombre(nombreUsuario);
 
-            // Verificar que el resultado es nulo
             Assert.IsNull(resultado, "El método debería devolver null cuando el nombre de usuario no existe.");
         }
 
         [TestMethod]
         public void ObtenerUsuarioPorNombre_NombreUsuarioNulo()
         {
-            // Llamar al método con un nombre de usuario nulo
             var resultadoNulo = GestorAmistad.ObtenerUsuarioPorNombre(null);
 
-            // Verificar que el resultado es nulo
             Assert.IsNull(resultadoNulo, "El método debería devolver null cuando el nombre de usuario es nulo.");
         }
 
@@ -289,19 +273,17 @@ namespace Pruebas
         [TestMethod]
         public void AceptarSolicitud_AmistadInexistente()
         {
-            int idAmistad = 0; // ID de una solicitud que no existe
+            int idAmistad = 0; 
 
-            // Llamar al método para aceptar la solicitud
             bool resultado = GestorAmistad.AceptarSolicitud(idAmistad);
 
-            // Verificar que el resultado es false, ya que la solicitud no existe
             Assert.IsFalse(resultado, "El método debería retornar false si la solicitud no existe.");
         }
 
         [TestMethod]
         public void AceptarSolicitud_SolicitudYaAceptada()
         {
-            int idAmistad = 1; // ID de una solicitud que ya está aceptada
+            int idAmistad = 1; 
             bool? estadoOriginal;
 
             using (var contexto = new DobbleBDEntidades())
@@ -309,16 +291,13 @@ namespace Pruebas
                 var amistad = contexto.Amistad.FirstOrDefault(a => a.idAmistad == idAmistad);
                 if (amistad != null && amistad.estadoSolicitud == true)
                 {
-                    estadoOriginal = amistad.estadoSolicitud; // Guardar el estado original
+                    estadoOriginal = amistad.estadoSolicitud; 
 
-                    // Llamar al método para aceptar la solicitud
                     bool resultado = GestorAmistad.AceptarSolicitud(idAmistad);
 
-                    // Verificar que el método retorna true, pero el estado no cambia
                     Assert.IsTrue(resultado, "El método debería retornar true aunque la solicitud ya esté aceptada.");
                     Assert.AreEqual(estadoOriginal, amistad.estadoSolicitud, "El estado de la solicitud no debería cambiar.");
 
-                    // Revertir cualquier cambio en la base de datos
                     amistad.estadoSolicitud = estadoOriginal;
                     contexto.SaveChanges();
                 }
@@ -329,12 +308,11 @@ namespace Pruebas
         [TestMethod]
         public void EliminarAmistad_AmistadExiste_Exito()
         {
-            int idAmistad = 1; // ID de una amistad existente
+            int idAmistad = 1; 
             DataAccess.Amistad amistadOriginal;
 
             using (var contexto = new DobbleBDEntidades())
             {
-                // Guardar la amistad original para revertir
                 amistadOriginal = contexto.Amistad.FirstOrDefault(a => a.idAmistad == idAmistad);
                 if (amistadOriginal != null)
                 {
@@ -346,14 +324,11 @@ namespace Pruebas
                         estadoSolicitud = amistadOriginal.estadoSolicitud
                     };
 
-                    // Llamar al método para eliminar la amistad
                     bool resultado = GestorAmistad.EliminarAmistad(idAmistad);
 
-                    // Verificar que la amistad fue eliminada
                     Assert.IsTrue(resultado, "La amistad debería haberse eliminado correctamente.");
                     Assert.IsNull(contexto.Amistad.FirstOrDefault(a => a.idAmistad == idAmistad), "La amistad debería estar eliminada de la base de datos.");
 
-                    // Revertir el cambio en la base de datos
                     contexto.Amistad.Add(amistadCopia);
                     contexto.SaveChanges();
                 }
@@ -363,20 +338,46 @@ namespace Pruebas
         [TestMethod]
         public void EliminarAmistad_AmistadNoExiste()
         {
-            int idAmistad = 0; // ID de una amistad inexistente
+            int idAmistad = 0; 
 
-            // Llamar al método para eliminar la amistad
             bool resultado = GestorAmistad.EliminarAmistad(idAmistad);
 
-            // Verificar que el resultado es false, ya que la amistad no existe
             Assert.IsFalse(resultado, "El método debería retornar false si la amistad no existe.");
         }
 
+        [TestMethod]
+        public void EliminarAmistad_IdInvalido()
+        {
+            int idAmistad = -1; 
+
+            bool resultado = GestorAmistad.EliminarAmistad(idAmistad);
+
+            Assert.IsFalse(resultado, "El método debería retornar false si el ID de amistad es inválido.");
+        }
 
 
+        [TestMethod]
+        public void ObtenerAmistades_Exitoso()
+        {
+            int idUsuario = 29; 
 
+            var amistades = GestorAmistad.ObtenerAmistades(idUsuario);
 
+            Assert.IsNotNull(amistades, "La lista de amistades no debería ser nula.");
+            Assert.IsTrue(amistades.Count > 1, "El usuario debería tener más de una amistad aceptada.");
+            Assert.IsTrue(amistades.All(a => a.estadoSolicitud == true), "Todas las amistades devueltas deberían estar aceptadas.");
+        }
 
+        [TestMethod]
+        public void ObtenerAmistades_ListaVacia()
+        {
+            int idUsuario = 2; 
+
+            var amistades = GestorAmistad.ObtenerAmistades(idUsuario);
+
+            Assert.IsNotNull(amistades, "La lista de amistades no debería ser nula.");
+            Assert.AreEqual(0, amistades.Count, "La lista de amistades debería estar vacía para un usuario sin amistades aceptadas.");
+        }
 
 
 
