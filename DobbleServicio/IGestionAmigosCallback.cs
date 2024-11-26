@@ -28,5 +28,11 @@ namespace DobbleServicio
 
         [OperationContract(IsOneWay = true)]
         void NotificarSalida(string nombreUsuario);
+
+        [OperationContract(IsOneWay = true)]
+        void NotificarInvitacionActiva(string nombreUsuario);
+
+        [OperationContract(IsOneWay = true)]
+        void NotificarVentanaInvitacion(string nombreUsuarioInvitacion);
     }
 }

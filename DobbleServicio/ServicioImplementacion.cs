@@ -578,7 +578,6 @@ namespace DobbleServicio
         {
             return GestorErrores.Ejecutar(() =>
             {
-                // Guarda la solicitud de amistad en la base de datos
                 bool solicitudEnviada = GestorAmistad.EnviarSolicitudAmistad(idUsuarioPrincipal, nombreUsuarioAmigo);
 
                 if (solicitudEnviada)
@@ -595,15 +594,12 @@ namespace DobbleServicio
             });
         }
 
-        // Método para conectar un cliente y registrar su callback
         public void ConectarCliente(string nombreUsuario)
         {
             var callback = OperationContext.Current.GetCallbackChannel<IGestionAmigosCallback>();
             clientesConectados.TryAdd(nombreUsuario, callback);
         }
 
-
-        // Método para desconectar un cliente y eliminar su callback
         public void DesconectarCliente(string nombreUsuario)
         {
             clientesConectados.TryRemove(nombreUsuario, out _);
@@ -616,7 +612,6 @@ namespace DobbleServicio
                 return clientesConectados.ContainsKey(nombreUsuario);
             });
         }
-
 
         public void NotificarCambios()
         {
@@ -631,6 +626,22 @@ namespace DobbleServicio
             foreach (var cliente in clientesConectados.Values)
             {
                 cliente.NotificarSalida(nombreUsuario);
+            }
+        }
+
+        public void NotificarBotonInvitacion(string nombreUsuario)
+        {
+            foreach (var cliente in clientesConectados.Values)
+            {
+                cliente.NotificarInvitacionActiva(nombreUsuario);
+            }
+        }
+
+        public void NotificarInvitacion(string nombreUsuario, string nombreUsuarioInvitacion)
+        {
+            if (clientesConectados.TryGetValue(nombreUsuario, out var callback))
+            {
+                callback.NotificarVentanaInvitacion(nombreUsuarioInvitacion);
             }
         }
     }

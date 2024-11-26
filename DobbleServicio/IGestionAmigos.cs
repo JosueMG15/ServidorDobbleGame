@@ -48,5 +48,11 @@ namespace DobbleServicio
 
         [OperationContract]
         void NotificarDesconexion(string nombreUsuario);
+
+        [OperationContract]
+        void NotificarBotonInvitacion(string nombreUsuario);
+
+        [OperationContract]
+        void NotificarInvitacion(string nombreUsuario, string nombreUsuarioInvitacion);
     }
 }
