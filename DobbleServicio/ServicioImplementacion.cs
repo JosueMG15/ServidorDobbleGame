@@ -680,7 +680,7 @@ namespace DobbleServicio
                         }
                     }
                 }
-            }); 
+            });
         }
 
         public bool AbandonarPartida(string nombreUsuario, string codigoSala)
@@ -710,6 +710,11 @@ namespace DobbleServicio
                                 AsignarNuevoAnfitrionDesdePartida(sala, jugador.Usuario);
                             }
 
+                            if (sala.PartidaSala.JugadoresEnPartida.Count == 1)
+                            {
+                                NotificarFinDePartida(sala);
+                            }
+
                             NotificarActualizacionDeJugadoresEnPartida(codigoSala);
                         }
 
@@ -728,11 +733,11 @@ namespace DobbleServicio
                 GestorErrores.EjecutarConManejoDeExcepciones(() =>
                 {
                     var nuevoAnfitrion = sala.PartidaSala.JugadoresEnPartida.FirstOrDefault(u => u.Usuario != usuarioActual);
-                        if (nuevoAnfitrion != null)
-                        {
-                            nuevoAnfitrion.EsAnfitrion = true;
-                            NotificarUsuarioPartida(nuevoAnfitrion, callback => callback.ConvertirEnAnfitrionDesdePartida());
-                        }
+                    if (nuevoAnfitrion != null)
+                    {
+                        nuevoAnfitrion.EsAnfitrion = true;
+                        NotificarUsuarioPartida(nuevoAnfitrion, callback => callback.ConvertirEnAnfitrionDesdePartida());
+                    }
                 });
             }
         }
@@ -763,7 +768,7 @@ namespace DobbleServicio
                         sala.PartidaSala.CartaCentral = cartas.Dequeue();
 
                         AsignarCartaCentral(sala, sala.PartidaSala.CartaCentral);
-                        
+
                         foreach (var jugador in sala.PartidaSala.JugadoresEnPartida.ToList())
                         {
                             var carta = cartas.Dequeue();
@@ -776,7 +781,7 @@ namespace DobbleServicio
 
         private void AsignarCartaCentral(Sala sala, Carta cartaCentral)
         {
-            sala.PartidaSala.CartaCentral = cartaCentral;   
+            sala.PartidaSala.CartaCentral = cartaCentral;
             Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
             {
                 jugador.CartaBloqueada = false;
@@ -807,7 +812,7 @@ namespace DobbleServicio
                             jugador.PuntosEnPartida++;
                             NotificarActualizacionDePuntosEnPartida(jugador.Usuario, jugador.PuntosEnPartida, sala);
                             AsignarCartaJugador(jugador, cartaCentral);
-                            
+
                             if (sala.PartidaSala.Cartas.Any())
                             {
                                 AsignarCartaCentral(sala, sala.PartidaSala.Cartas.Dequeue());
@@ -867,6 +872,35 @@ namespace DobbleServicio
                 });
             });
         }
+
+        public RespuestaServicio<bool> GuardarPuntosJugador(string nombreJugador, int puntosGanados)
+        {
+            return GestorErrores.Ejecutar(() =>
+            {
+                bool exito = RegistroUsuario.RegistrarPuntosGanados(nombreJugador, puntosGanados);
+
+                var cuentaUsuario = UsuariosActivos.Values.FirstOrDefault(c => c.Usuario == nombreJugador);
+                if (exito && cuentaUsuario != null)
+                {
+                    int? puntaje = RegistroUsuario.ObtenerPuntosUsuario(nombreJugador);
+
+                    if (puntaje.HasValue)
+                    {
+                        cuentaUsuario.Puntaje = puntaje.Value;
+                    }
+
+                    UsuariosActivos.AddOrUpdate(cuentaUsuario.Usuario, cuentaUsuario, (key, oldValue) => cuentaUsuario);
+                    /*
+                    foreach (var cliente in clientesConectados.Values)
+                    {
+                        cliente.NotificarCambio();
+                    }*/
+                }
+
+                return exito;
+            });
+        }
+    
 
         public void NotificarActualizacionDeJugadoresEnPartida(string codigoSala)
         {

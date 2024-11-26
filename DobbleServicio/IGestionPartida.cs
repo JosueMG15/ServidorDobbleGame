@@ -25,6 +25,8 @@ namespace DobbleServicio
         void NotificarDistribucionCartas (string codigoSala);
         [OperationContract(IsOneWay = true)]
         void ValidarCarta(string nombreUsuario, string rutaIcono, string codigoSala);
+        [OperationContract]
+        RespuestaServicio<bool> GuardarPuntosJugador(string nombreJugador, int puntosGanados);
     }
 
     [ServiceContract]

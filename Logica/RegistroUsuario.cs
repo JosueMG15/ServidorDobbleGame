@@ -73,15 +73,51 @@ namespace Logica
             }
         }
 
+        public static bool RegistrarPuntosGanados(string nombreUsuario, int puntosGanados)
+        {
+            using (var contexto = new DobbleBDEntidades())
+            {
+                var jugador = (from cuenta in contexto.Cuenta
+                                join usuario in contexto.Usuario
+                                on cuenta.idCuenta
+                                equals usuario.idCuenta
+                                where cuenta.nombreUsuario == nombreUsuario
+                                select usuario).FirstOrDefault();
+
+                if (jugador != null)
+                {
+                    jugador.puntaje = jugador.puntaje + puntosGanados;
+                    contexto.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public static int? ObtenerPuntosUsuario(string nombreUsuario)
+        {
+            using (var contexto = new DobbleBDEntidades())
+            {
+                var puntaje = (from cuenta in contexto.Cuenta
+                               join usuario in contexto.Usuario
+                               on cuenta.idCuenta
+                               equals usuario.idCuenta
+                               where cuenta.nombreUsuario == nombreUsuario
+                               select usuario.puntaje).FirstOrDefault();
+
+                return puntaje;
+            }
+        }
+
         //Podría estar en otra clase
         public static CuentaUsuario IniciarSesion(string nombreUsuario, string contraseña)
         {
             CuentaUsuario cuentaUsuario = null;
             using (var contexto = new DobbleBDEntidades())
             {
-                var consulta = (from cuenta in contexto.Cuenta
+                cuentaUsuario = (from cuenta in contexto.Cuenta
                                  join usuario in contexto.Usuario
-                                 on cuenta.Usuario.idCuenta 
+                                 on cuenta.idCuenta
                                  equals usuario.idCuenta
                                  where cuenta.nombreUsuario == nombreUsuario
                                  && cuenta.contraseña == contraseña
@@ -93,11 +129,11 @@ namespace Logica
                                      Contraseña = cuenta.contraseña,
                                      Foto = usuario.foto,
                                      Puntaje = usuario.puntaje.Value,
-                                 }).Take(1);
+                                 }).FirstOrDefault();
 
-                cuentaUsuario = consulta.FirstOrDefault();
+
             }
-            
+
             return cuentaUsuario;
         }
 
@@ -106,21 +142,19 @@ namespace Logica
             CuentaUsuario cuentaUsuario = null;
             using (var contexto = new DobbleBDEntidades())
             {
-                var consulta = (from cuenta in contexto.Cuenta
-                                join usuario in contexto.Usuario
-                                on cuenta.idCuenta equals usuario.idCuenta
-                                where cuenta.correo == correo
-                                select new CuentaUsuario
-                                {
-                                    IdCuentaUsuario = cuenta.idCuenta,
-                                    Usuario = cuenta.nombreUsuario,
-                                    Correo = cuenta.correo,
-                                    Contraseña = cuenta.contraseña,
-                                    Foto = usuario.foto,
-                                    Puntaje = usuario.puntaje.Value,
-                                }).Take(1);
-
-                cuentaUsuario = consulta.FirstOrDefault();
+                cuentaUsuario = (from cuenta in contexto.Cuenta
+                                 join usuario in contexto.Usuario
+                                 on cuenta.idCuenta equals usuario.idCuenta
+                                 where cuenta.correo == correo
+                                 select new CuentaUsuario
+                                 {
+                                     IdCuentaUsuario = cuenta.idCuenta,
+                                     Usuario = cuenta.nombreUsuario,
+                                     Correo = cuenta.correo,
+                                     Contraseña = cuenta.contraseña,
+                                     Foto = usuario.foto,
+                                     Puntaje = usuario.puntaje.Value,
+                                 }).FirstOrDefault();
             }
 
             return cuentaUsuario;

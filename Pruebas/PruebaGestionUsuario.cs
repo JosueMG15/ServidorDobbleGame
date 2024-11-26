@@ -36,20 +36,17 @@ namespace Pruebas
             using (var contexto = new DobbleBDEntidades())
             {
                 var cuentaUsuario = contexto.Cuenta.Find(idCuenta);
-                nombreOriginal = cuentaUsuario?.nombreUsuario; // Guardar el nombre original
+                nombreOriginal = cuentaUsuario?.nombreUsuario; 
             }
 
             try
             {
-                //Modificar el nombre
                 bool resultado = ModificarUsuario.ModificarNombreUsuario(idCuenta, nuevoNombre);
 
-                //Verificar que el cambio fue exitoso
                 Assert.IsTrue(resultado, "El nombre de usuario debería haberse modificado correctamente.");
             }
             finally
             {
-                //Restaurar el nombre original
                 ModificarUsuario.ModificarNombreUsuario(idCuenta, nombreOriginal);
             }
         }
@@ -97,7 +94,7 @@ namespace Pruebas
         [TestMethod]
         public void ModificarContraseñaUsuario_IdNoExiste()
         {
-            int idCuentaInexistente = 0; // ID que no existe
+            int idCuentaInexistente = 0; 
             string nuevaContraseña = "nuevaContraseña";
 
             bool resultado = ModificarUsuario.ModificarContraseñaUsuario(idCuentaInexistente, nuevaContraseña);
@@ -128,7 +125,7 @@ namespace Pruebas
             Assert.IsNotNull(usuario, "El usuario no existe en la base de datos.");
 
             byte[] fotoOriginal = usuario.foto;
-            byte[] nuevaFoto = new byte[] { 0x20, 0x21, 0x22 }; // Foto simulada como byte array
+            byte[] nuevaFoto = new byte[] { 0x20, 0x21, 0x22 }; 
 
             bool resultado = ModificarUsuario.ModificarFotoUsuario(idCuenta, nuevaFoto);
 
@@ -156,7 +153,6 @@ namespace Pruebas
             Assert.IsNotNull(usuario, "El usuario no existe en la base de datos.");
 
             byte[] fotoOriginal = usuario.foto;
-            // Simula una foto grande (por ejemplo, 5 MB)
             byte[] fotoGrande = new byte[5 * 1024 * 1024];
             new Random().NextBytes(fotoGrande);
 

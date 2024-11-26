@@ -18,6 +18,7 @@ namespace DataAccess
         public DobbleBDEntidades()
             : base("name=DobbleBDEntidades")
         {
+            this.Database.CommandTimeout = 30;
         }
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

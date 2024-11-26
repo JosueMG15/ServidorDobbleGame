@@ -90,6 +90,9 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>ModeloDatosDobble.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <None Include="CadenaDeConexion.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="ModeloDatosDobble.edmx.diagram">
       <DependentUpon>ModeloDatosDobble.edmx</DependentUpon>
     </None>
