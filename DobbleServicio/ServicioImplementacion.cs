@@ -206,6 +206,11 @@ namespace DobbleServicio
                 return obtenerUsuario;
             });
         }
+
+        public bool Ping(string nombreUsuario)
+        {
+            return UsuariosActivos.TryGetValue(nombreUsuario, out _);
+        }
     }
 
     public partial class ServicioImplementacion : IGestionSala
