@@ -162,7 +162,6 @@ namespace Logica
             }
         }
 
-
         public static List<Logica.Amistad> ObtenerAmistades(int idUsuario)
         {
             using (var contexto = new DobbleBDEntidades())
@@ -192,17 +191,14 @@ namespace Logica
         {
             using (var contexto = new DobbleBDEntidades())
             {
-                // Buscar la amistad por idAmistad
                 var amistad = contexto.Amistad
                     .FirstOrDefault(a => a.idAmistad == idAmistad);
 
-                // Verificar si se encontró la amistad
                 if (amistad == null)
                 {
-                    return null; // O maneja el caso en que no se encuentra la amistad según sea necesario
+                    return null; 
                 }
 
-                // Mapeo manual de DataAccess.Amistad a Logica.Amistad
                 var amistadLogica = new Logica.Amistad
                 {
                     idAmistad = amistad.idAmistad,
@@ -219,18 +215,15 @@ namespace Logica
         {
             using (var contexto = new DobbleBDEntidades())
             {
-                // Obtener el último registro de la tabla Amistad
                 var amistad = contexto.Amistad
                     .OrderByDescending(a => a.idAmistad)
                     .FirstOrDefault();
 
-                // Verificar si se encontró algún registro
                 if (amistad == null)
                 {
-                    return null; // Maneja el caso en que no hay registros
+                    return null; 
                 }
 
-                // Mapeo manual de DataAccess.Amistad a Logica.Amistad
                 var amistadLogica = new Logica.Amistad
                 {
                     idAmistad = amistad.idAmistad,
@@ -242,6 +235,5 @@ namespace Logica
                 return amistadLogica;
             }
         }
-
     }
 }

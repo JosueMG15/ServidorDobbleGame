@@ -18,7 +18,7 @@ namespace Logica
                 var smtpClient = new SmtpClient("smtp.gmail.com")
                 {
                     Port = 587,
-                    Credentials = new NetworkCredential("dobblegame11@gmail.com", "vmnm nqfu ercs sazf"),
+                    Credentials = new NetworkCredential("dobblegame11@gmail.com", "mwqb wdot tqnx hcyi"),
                     EnableSsl = true,
                 };
                 smtpClient.Send("dobblegame11@gmail.com", correo, "Código de Verificación", $"Tu código es: {codigo}");
