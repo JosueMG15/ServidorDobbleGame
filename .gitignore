@@ -369,3 +369,7 @@ FodyWeavers.xsd
 /Host/CadenaDeConexion.config
 /Logica/CadenaDeConexion.config
 /Pruebas/CadenaDeConexion.config
+/Logica/CadenaDeConexion.config
+/Pruebas/CadenaDeConexion.config
+/Host/CadenaDeConexion.config
+/DataAccess/CadenaDeConexion.config
