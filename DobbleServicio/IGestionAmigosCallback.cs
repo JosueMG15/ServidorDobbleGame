@@ -33,6 +33,6 @@ namespace DobbleServicio
         void NotificarInvitacionActiva(string nombreUsuario);
 
         [OperationContract(IsOneWay = true)]
-        void NotificarVentanaInvitacion(string nombreUsuarioInvitacion);
+        void NotificarVentanaInvitacion(string nombreUsuarioInvitacion, string codigoSala);
     }
 }

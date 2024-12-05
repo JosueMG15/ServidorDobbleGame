@@ -109,7 +109,6 @@ namespace Logica
             }
         }
 
-        //Podría estar en otra clase
         public static CuentaUsuario IniciarSesion(string nombreUsuario, string contraseña)
         {
             CuentaUsuario cuentaUsuario = null;
@@ -130,8 +129,6 @@ namespace Logica
                                      Foto = usuario.foto,
                                      Puntaje = usuario.puntaje.Value,
                                  }).FirstOrDefault();
-
-
             }
 
             return cuentaUsuario;

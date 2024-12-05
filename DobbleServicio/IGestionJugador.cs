@@ -22,6 +22,8 @@ namespace DobbleServicio
 
         [OperationContract]
         RespuestaServicio<CuentaUsuario> IniciarSesionJugador(string nombreUsuario, string contraseña);
+        [OperationContract]
+        RespuestaServicio<CuentaUsuario> IniciarSesionInvitado(string nombreUsuario, byte[] foto);
 
         [OperationContract(IsOneWay = true)]
         void CerrarSesionJugador(string nombreUsuario, string mensaje);
@@ -40,7 +42,5 @@ namespace DobbleServicio
 
         [OperationContract]
         RespuestaServicio<CuentaUsuario> ObtenerUsuarioPorCorreo(string correo);
-        [OperationContract]
-        bool Ping(string nombreUsuario);
     }   
 }

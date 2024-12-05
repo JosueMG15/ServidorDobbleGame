@@ -57,6 +57,7 @@ namespace Pruebas
             };
             Assert.IsTrue(RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuario), "El método no registra un correo con datos válidos");
         }
+
         [TestMethod]
         public void RegistrarUsuario_CamposNulosDevuelveFalso()
         {
@@ -79,6 +80,7 @@ namespace Pruebas
             CuentaUsuario cuentaUsuarioExistente = RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
             Assert.IsNotNull(cuentaUsuarioExistente, "El método no retorna la cuenta del usuario aunque si existe");
         }
+
         [TestMethod]
         public void IniciarSesion_DatosIncorrectos()
         {
@@ -87,6 +89,42 @@ namespace Pruebas
 
             CuentaUsuario cuentaUsuarioInexistente = RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
             Assert.IsNull(cuentaUsuarioInexistente, "El método retorna una cuenta de usuario aunque esta no exista");
+        }
+
+        [TestMethod]
+        public void RegistrarPuntosGanados_Exitoso()
+        {
+            string nombreUsuario = "osopanda";
+            int puntosGanados = 10;
+
+            Assert.IsTrue(RegistroUsuario.RegistrarPuntosGanados(nombreUsuario, puntosGanados), "El método no esta registrando los puntos correctamente");
+        }
+
+        [TestMethod]
+        public void RegistrarPuntosGanados_NoExisteElUsuario()
+        {
+            string nombreUsuario = "usuarioInexistente";
+            int puntosGanados = 10;
+
+            Assert.IsFalse(RegistroUsuario.RegistrarPuntosGanados(nombreUsuario, puntosGanados), "El método esta registrando puntos a un usuario que no existe");
+        }
+
+        [TestMethod]
+        public void ObtenerPuntosUsuario_Exitoso()
+        {
+            string nombreUsuario = "osopanda";
+            int? puntos = RegistroUsuario.ObtenerPuntosUsuario(nombreUsuario);
+
+            Assert.IsTrue(puntos >= 0, "El método devolvió un valor negativo, lo cual no es válido para los puntos del usuario.");
+        }
+
+        [TestMethod]
+        public void ObtenerPuntosUsuario_UsuarioInexistente()
+        {
+            string nombreUsuario = "usuarioInexistente";
+            int? puntos = RegistroUsuario.ObtenerPuntosUsuario(nombreUsuario);
+
+            Assert.IsNull(puntos, "El método no devolvió null como se esperaba para un usuario inexistente.");
         }
     }
 }

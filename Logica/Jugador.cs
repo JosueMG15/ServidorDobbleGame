@@ -23,6 +23,8 @@ namespace Logica
         public int PuntosEnPartida { get; set; }
         [DataMember]
         public int NumeroJugador { get; set; }
+        [DataMember]
+        public bool EstaListo { get; set; } = false;
         public bool CartaBloqueada { get; set; } = false;
         public OperationContext ContextoOperacion { get; set; }
     }
