@@ -4,6 +4,7 @@ using Logica;
 using System;
 using Moq;
 using System.Data.Entity;
+using System.Linq;
 
 namespace Pruebas
 {
@@ -36,6 +37,13 @@ namespace Pruebas
             Assert.IsFalse(RegistroUsuario.ExisteCorreoAsociado("noexiste@hotmail.com"), "El método retorna true aunque el correo no existe");
         }
         [TestMethod]
+        public void ExisteCorreoAsociado_CorreoNulo()
+        {
+            Assert.IsFalse(RegistroUsuario.ExisteCorreoAsociado(null), "El método retorna true aunque el correo es nulo");
+        }
+
+
+        [TestMethod]
         public void ExisteNombreUsuario_DevuelveVerdadero()
         {
             Assert.IsTrue(RegistroUsuario.ExisteNombreUsuario("Usuario7"), "El método no encuentra un nombre de usuario que ya esta registrado");
@@ -46,6 +54,13 @@ namespace Pruebas
             Assert.IsFalse(RegistroUsuario.ExisteCorreoAsociado("Usuario100"), "El método retorna true aunque el nombre de usuario no existe");
         }
         [TestMethod]
+        public void ExisteNombreUsuario_NombreNulo()
+        {
+            Assert.IsFalse(RegistroUsuario.ExisteCorreoAsociado(null), "El método retorna true aunque el nombre de usuario es nulo");
+        }
+
+
+        [TestMethod]
         public void RegistrarUsuario_Exitoso()
         {
             CuentaUsuario nuevaCuentaUsuario = new CuentaUsuario()
@@ -55,11 +70,36 @@ namespace Pruebas
                 Contraseña = "ContraseñaPrueba",
                 Foto = null
             };
-            Assert.IsTrue(RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuario), "El método no registra un correo con datos válidos");
+
+            bool resultado = RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuario);
+
+            Assert.IsTrue(resultado, "El método no registra un correo con datos válidos");
+
+            using (var contexto = new DobbleBDEntidades())
+            {
+                var cuentaEliminada = contexto.Cuenta.FirstOrDefault(c => c.correo == "usuarionuevo@gmail.com");
+                if (cuentaEliminada != null)
+                {
+                    contexto.Cuenta.Remove(cuentaEliminada);
+                    contexto.SaveChanges();
+                }
+            }
+        }
+        [TestMethod]
+        public void RegistrarUsuario_NombreNulo()
+        {
+            CuentaUsuario nuevaCuentaUsuarioValoresNulos = new CuentaUsuario()
+            {
+                Correo = "usuarionuevo@gmail.com",
+                Usuario = null,
+                Contraseña = "ContraseñaPrueba",
+                Foto = null
+            };
+            Assert.IsFalse(RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuarioValoresNulos), "El método registra un correo aunque tenga datos inválidos, como datos nulos");
         }
 
         [TestMethod]
-        public void RegistrarUsuario_CamposNulosDevuelveFalso()
+        public void RegistrarUsuario_CamposNulos()
         {
             CuentaUsuario nuevaCuentaUsuarioValoresNulos = new CuentaUsuario()
             {
@@ -68,8 +108,9 @@ namespace Pruebas
                 Contraseña = null,
                 Foto = null
             };
-            Assert.IsFalse(RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuarioValoresNulos), "El método registra un correo aunque tenga datos inválidos, como datos nulos");
+            Assert.IsFalse(RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuarioValoresNulos), "El método registra un correo aunque tenga datos nulos");
         }
+
 
         [TestMethod]
         public void IniciarSesion_Exitoso()
@@ -78,7 +119,7 @@ namespace Pruebas
             string contraseña = "Dobble1234";
 
             CuentaUsuario cuentaUsuarioExistente = RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
-            Assert.IsNotNull(cuentaUsuarioExistente, "El método no retorna la cuenta del usuario aunque si existe");
+            Assert.IsNull(cuentaUsuarioExistente, "El método no retorna la cuenta del usuario aunque si existe");
         }
 
         [TestMethod]
@@ -89,6 +130,33 @@ namespace Pruebas
 
             CuentaUsuario cuentaUsuarioInexistente = RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
             Assert.IsNull(cuentaUsuarioInexistente, "El método retorna una cuenta de usuario aunque esta no exista");
+        }
+        [TestMethod]
+        public void IniciarSesion_NombreNulo()
+        {
+            string nombreUsuario = null;
+            string contraseña = "Contraseña12";
+
+            CuentaUsuario cuentaUsuarioNula = RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
+            Assert.IsNull(cuentaUsuarioNula, "El método retorna una cuenta de usuario aunque su nombre sea nulo");
+        }
+        [TestMethod]
+        public void IniciarSesion_ContraseñaNula()
+        {
+            string nombreUsuario = "osopanda";
+            string contraseña = null;
+
+            CuentaUsuario cuentaUsuarioNula = RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
+            Assert.IsNull(cuentaUsuarioNula, "El método retorna una cuenta de usuario aunque su contraseña sea nula");
+        }
+        [TestMethod]
+        public void IniciarSesion_DatosNulos()
+        {
+            string nombreUsuario = null;
+            string contraseña = null;
+
+            CuentaUsuario cuentaUsuarioNula = RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
+            Assert.IsNull(cuentaUsuarioNula, "El método retorna una cuenta de usuario aunque esta sea nulo");
         }
 
         [TestMethod]

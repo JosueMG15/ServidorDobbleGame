@@ -166,14 +166,11 @@ namespace Logica
         {
             using (var contexto = new DobbleBDEntidades())
             {
-                // Obtener las amistades donde el estadoSolicitud es true
-                // y el idUsuario está presente en UsuarioPrincipalId o UsuarioAmigoId
                 var amistades = contexto.Amistad
                     .Where(a => (a.estadoSolicitud == true && a.UsuarioPrincipalId == idUsuario) ||
                                 (a.estadoSolicitud == true && a.UsuarioAmigoId == idUsuario))
                     .ToList();
 
-                // Mapeo manual de DataAccess.Amistad a Logica.Amistad
                 var amistadesLogica = amistades.Select(a => new Logica.Amistad
                 {
                     idAmistad = a.idAmistad,

@@ -53,13 +53,13 @@ namespace Pruebas
 
             var nuevaSolicitud = contexto.Amistad
                 .FirstOrDefault(a => a.UsuarioPrincipalId == idUsuarioPrincipal && a.UsuarioAmigoId == idUsuarioAmigo);
+
             if (nuevaSolicitud != null)
             {
                 contexto.Amistad.Remove(nuevaSolicitud);
                 contexto.SaveChanges();
             }
         }
-
         [TestMethod]
         public void EnviarSolicitudAmistad_UsuarioAmigoInexistente()
         {
@@ -68,6 +68,15 @@ namespace Pruebas
             bool resultado = GestorAmistad.EnviarSolicitudAmistad(idUsuarioPrincipal, nombreUsuarioAmigoInexistente);
 
             Assert.IsFalse(resultado, "El método devolvió true cuando el usuario amigo no existe.");
+        }
+        [TestMethod]
+        public void EnviarSolicitudAmistad_UsuarioNulo()
+        {
+            string nombreUsuarioAmigo = null;
+
+            bool resultado = GestorAmistad.EnviarSolicitudAmistad(idUsuarioPrincipal, nombreUsuarioAmigo);
+
+            Assert.IsFalse(resultado, "El método devolvió true cuando el usuario amigo es nulo.");
         }
 
 
@@ -90,7 +99,6 @@ namespace Pruebas
             contexto.Amistad.Remove(amistadExistente);
             contexto.SaveChanges();
         }
-
         [TestMethod]
         public void AmistadYaExiste_AmistadNoExistente()
         {
@@ -108,7 +116,6 @@ namespace Pruebas
 
             Assert.IsFalse(resultado, "El método detectó una amistad inexistente.");
         }
-
         [TestMethod]
         public void AmistadYaExiste_UsuarioAmigoInexistente()
         {
@@ -117,6 +124,13 @@ namespace Pruebas
             bool resultado = GestorAmistad.AmistadYaExiste(idUsuarioPrincipal, nombreUsuarioInexistente);
 
             Assert.IsFalse(resultado, "El método devolvió true cuando el usuario amigo no existe.");
+        }
+        [TestMethod]
+        public void AmistadYaExiste_ValoresNulos()
+        {
+            bool resultado = GestorAmistad.AmistadYaExiste(idUsuarioPrincipal, null);
+
+            Assert.IsFalse(resultado, "El método devolvió true cuando el usuario amigo es nulo.");
         }
 
 
@@ -141,7 +155,6 @@ namespace Pruebas
             contexto.Amistad.Remove(nuevaSolicitud);
             contexto.SaveChanges();
         }
-
         [TestMethod]
         public void ObtenerSolicitudesPendientes_SinSolicitudesPendientes()
         {
@@ -158,9 +171,8 @@ namespace Pruebas
 
             Assert.AreEqual(0, solicitudes.Count, "El método devolvió solicitudes pendientes inesperadas.");
         }
-
         [TestMethod]
-        public void ObtenerSolicitudesPendientes_UsuarioAmigoInexistente()
+        public void ObtenerSolicitudesPendientes_UsuarioInexistente()
         {
             int idUsuarioInexistente = 0; 
 
@@ -183,7 +195,6 @@ namespace Pruebas
             Assert.AreEqual(usuarioOriginal.nombreUsuario, cuentaUsuario.Usuario, "El nombre de usuario no coincide.");
             Assert.AreEqual(usuarioOriginal.correo, cuentaUsuario.Correo, "El correo no coincide.");
         }
-
         [TestMethod]
         public void ObtenerUsuario_UsuarioNoExistente()
         {
@@ -193,7 +204,6 @@ namespace Pruebas
 
             Assert.IsNull(cuentaUsuario, "El método debería devolver null para un usuario inexistente.");
         }
-
         [TestMethod]
         public void ObtenerUsuario_VerificarDatos()
         {
@@ -244,9 +254,9 @@ namespace Pruebas
 
 
         [TestMethod]
-        public void AceptarSolicitud_Exita()
+        public void AceptarSolicitud_Exito()
         {
-            int idAmistad = 3; // ID de una solicitud pendiente en la base de datos
+            int idAmistad = 3; 
             bool? estadoOriginal = false;
 
             using (var contexto = new DobbleBDEntidades())
@@ -254,22 +264,18 @@ namespace Pruebas
                 var amistad = contexto.Amistad.FirstOrDefault(a => a.idAmistad == idAmistad);
                 if (amistad != null)
                 {
-                    estadoOriginal = amistad.estadoSolicitud; // Guardar el estado original para revertir
+                    estadoOriginal = amistad.estadoSolicitud; 
 
-                    // Llamar al método para aceptar la solicitud
                     bool resultado = GestorAmistad.AceptarSolicitud(idAmistad);
 
-                    // Verificar que la solicitud fue aceptada correctamente
                     Assert.IsTrue(resultado, "La solicitud debería haberse aceptado correctamente.");
                     Assert.IsTrue(amistad.estadoSolicitud, "El estado de la solicitud debería ser 'aceptado'.");
 
-                    // Revertir el cambio en la base de datos
                     amistad.estadoSolicitud = estadoOriginal;
                     contexto.SaveChanges();
                 }
             }
         }
-
         [TestMethod]
         public void AceptarSolicitud_AmistadInexistente()
         {
@@ -279,7 +285,6 @@ namespace Pruebas
 
             Assert.IsFalse(resultado, "El método debería retornar false si la solicitud no existe.");
         }
-
         [TestMethod]
         public void AceptarSolicitud_SolicitudYaAceptada()
         {
@@ -334,7 +339,6 @@ namespace Pruebas
                 }
             }
         }
-
         [TestMethod]
         public void EliminarAmistad_AmistadNoExiste()
         {
@@ -344,7 +348,6 @@ namespace Pruebas
 
             Assert.IsFalse(resultado, "El método debería retornar false si la amistad no existe.");
         }
-
         [TestMethod]
         public void EliminarAmistad_IdInvalido()
         {
@@ -367,7 +370,6 @@ namespace Pruebas
             Assert.IsTrue(amistades.Count > 1, "El usuario debería tener más de una amistad aceptada.");
             Assert.IsTrue(amistades.All(a => a.estadoSolicitud == true), "Todas las amistades devueltas deberían estar aceptadas.");
         }
-
         [TestMethod]
         public void ObtenerAmistades_ListaVacia()
         {
@@ -378,7 +380,6 @@ namespace Pruebas
             Assert.IsNotNull(amistades, "La lista de amistades no debería ser nula.");
             Assert.AreEqual(0, amistades.Count, "La lista de amistades debería estar vacía para un usuario sin amistades aceptadas.");
         }
-
         [TestMethod]
         public void ObtenerAmistades_DevuelveListaVacia()
         {

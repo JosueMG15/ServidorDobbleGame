@@ -530,7 +530,6 @@ namespace DobbleServicio
 
     public partial class ServicioImplementacion : IGestionAmigos, IGestionNotificacionesAmigos
     {
-        // Diccionario para almacenar los callbacks de los clientes conectados
         private readonly ConcurrentDictionary<string, IGestionAmigosCallback> clientesConectados =
             new ConcurrentDictionary<string, IGestionAmigosCallback>();
 
@@ -647,10 +646,8 @@ namespace DobbleServicio
 
                 if (solicitudEnviada)
                 {
-                    // Verifica si el destinatario está conectado y tiene un callback disponible
                     if (clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callback))
                     {
-                        // Llama al método de callback para notificar al destinatario
                         callback.NotificarSolicitudAmistad();
                     }
                 }
@@ -698,7 +695,7 @@ namespace DobbleServicio
         {
             foreach (var cliente in clientesConectados.Values)
             {
-                cliente.NotificarInvitacionActiva(nombreUsuario);
+                cliente.NotificarInvitacionCambio(nombreUsuario);
             }
         }
 

@@ -50,9 +50,8 @@ namespace Pruebas
                 ModificarUsuario.ModificarNombreUsuario(idCuenta, nombreOriginal);
             }
         }
-
         [TestMethod]
-        public void ModificarNombreUsuario_IdNoExiste()
+        public void ModificarNombreUsuario_CuentaInexistente()
         {
             int idCuentaInexistente = 0; 
             string nuevoNombre = "NombrePrueba";
@@ -61,16 +60,25 @@ namespace Pruebas
 
             Assert.IsFalse(resultado, "El método debería devolver false cuando el ID de cuenta no existe.");
         }
-
         [TestMethod]
         public void ModificarNombreUsuario_NombreUsuarioExistente()
         {
-            int idCuentaInexistente = 1;
+            int idCuenta = 1;
             string nuevoNombre = "Gustavo";
 
-            bool resultado = ModificarUsuario.ModificarNombreUsuario(idCuentaInexistente, nuevoNombre);
+            bool resultado = ModificarUsuario.ModificarNombreUsuario(idCuenta, nuevoNombre);
 
-            Assert.IsFalse(resultado, "El método debería devolver false cuando el nombre de la cuenta es nulo.");
+            Assert.IsFalse(resultado, "El método debería devolver false cuando el nombre de la ya existe.");
+        }
+        [TestMethod]
+        public void ModificarNombreUsuario_NombreRepetido()
+        {
+            int idCuenta = 3;
+            string nuevoNombre = "pan cake";
+
+            bool resultado = ModificarUsuario.ModificarNombreUsuario(idCuenta, nuevoNombre);
+
+            Assert.IsFalse(resultado, "El método debería devolver false cuando el nombre de la cuenta es el mismo.");
         }
 
 
@@ -90,9 +98,8 @@ namespace Pruebas
 
             ModificarUsuario.ModificarContraseñaUsuario(idCuenta, contraseñaOriginal);
         }
-
         [TestMethod]
-        public void ModificarContraseñaUsuario_IdNoExiste()
+        public void ModificarContraseñaUsuario_CuentaInexistente()
         {
             int idCuentaInexistente = 0; 
             string nuevaContraseña = "nuevaContraseña";
@@ -101,9 +108,8 @@ namespace Pruebas
 
             Assert.IsFalse(resultado, "El método devolvió true para una cuenta inexistente.");
         }
-
         [TestMethod]
-        public void ModificarContraseñaUsuario_ContraseñaNoModificada_DeberiaDevolverFalse()
+        public void ModificarContraseñaUsuario_ContraseñaNoModificada()
         {
             int idCuenta = 1; 
             var cuenta = contexto.Cuenta.FirstOrDefault(c => c.idCuenta == idCuenta);
@@ -114,6 +120,16 @@ namespace Pruebas
             bool resultado = ModificarUsuario.ModificarContraseñaUsuario(idCuenta, contraseñaOriginal);
 
             Assert.IsFalse(resultado, "El método devolvió true aunque la contraseña no fue modificada.");
+        }
+        [TestMethod]
+        public void ModificarContraseñaUsuario_ContraseñaRepetida()
+        {
+            int idCuentaInexistente = 1;
+            string nuevaContraseña = "Contraseña12";
+
+            bool resultado = ModificarUsuario.ModificarContraseñaUsuario(idCuentaInexistente, nuevaContraseña);
+
+            Assert.IsFalse(resultado, "El método devolvió true para una contraseña repetida.");
         }
 
 
@@ -133,9 +149,8 @@ namespace Pruebas
 
             ModificarUsuario.ModificarFotoUsuario(idCuenta, fotoOriginal);
         }
-
         [TestMethod]
-        public void ModificarFotoUsuario_IdNoExiste()
+        public void ModificarFotoUsuario_CuentaInexistente()
         {
             int idCuentaInexistente = 0; 
             byte[] nuevaFoto = new byte[] { 0x30, 0x31, 0x32 };
@@ -144,7 +159,6 @@ namespace Pruebas
 
             Assert.IsFalse(resultado, "El método devolvió true para un usuario inexistente.");
         }
-
         [TestMethod]
         public void ModificarFotoUsuario_FotoGrande()
         {
@@ -162,6 +176,26 @@ namespace Pruebas
 
             ModificarUsuario.ModificarFotoUsuario(idCuenta, fotoOriginal);
         }
+        [TestMethod]
+        public void ModificarFotoUsuario_FotoNula()
+        {
+            int idCuentaInexistente = 0;
+            byte[] nuevaFoto = null;
+
+            bool resultado = ModificarUsuario.ModificarFotoUsuario(idCuentaInexistente, nuevaFoto);
+
+            Assert.IsFalse(resultado, "El método devolvió true para una foto nula");
+        }
+        [TestMethod]
+        public void ModificarFotoUsuario_CuentaInexistenteYFotoNula()
+        {
+            int idCuentaInexistente = 0;
+            byte[] nuevaFoto = null;
+
+            bool resultado = ModificarUsuario.ModificarFotoUsuario(idCuentaInexistente, nuevaFoto);
+
+            Assert.IsFalse(resultado, "El método devolvió true para una foto nula y un id inexistente");
+        }
 
 
         [TestMethod]
@@ -177,7 +211,6 @@ namespace Pruebas
 
             Assert.IsTrue(resultado, "La contraseña correcta no fue validada correctamente.");
         }
-
         [TestMethod]
         public void ValidarContraseña_ContraseñaIncorrecta()
         {
@@ -191,7 +224,6 @@ namespace Pruebas
 
             Assert.IsFalse(resultado, "La contraseña incorrecta fue validada como correcta.");
         }
-
         [TestMethod]
         public void ValidarContraseña_CuentaInexistente()
         {
@@ -201,6 +233,58 @@ namespace Pruebas
             bool resultado = ModificarUsuario.ValidarContraseña(idCuentaInexistente, contraseña);
 
             Assert.IsFalse(resultado, "El método devolvió true para una cuenta inexistente.");
+        }
+        [TestMethod]
+        public void ValidarContraseña_ContraseñaNula()
+        {
+            int idCuentaInexistente = 1;
+            string contraseña = null;
+
+            bool resultado = ModificarUsuario.ValidarContraseña(idCuentaInexistente, contraseña);
+
+            Assert.IsFalse(resultado, "El método devolvió true para una contraseña nula.");
+        }
+        [TestMethod]
+        public void ValidarContraseña_CuentaInexistenteYContraseñaNula()
+        {
+            int idCuentaInexistente = 0;
+            string contraseña = null;
+
+            bool resultado = ModificarUsuario.ValidarContraseña(idCuentaInexistente, contraseña);
+
+            Assert.IsFalse(resultado, "El método devolvió true para una cuenta inexistentey una contraseña nula.");
+        }
+
+
+        [TestMethod]
+        public void EnviarCorreo_Exitoso()
+        {
+            string correo = "destinatario@gmail.com";
+            string codigo = "123456";
+
+            bool resultado = GestorCorreo.EnviarCorreo(correo, codigo);
+
+            Assert.IsTrue(resultado, "El método no envió el correo correctamente con parámetros válidos.");
+        }
+        [TestMethod]
+        public void EnviarCorreo_CorreoInvalido()
+        {
+            string correo = "correo_invalido"; 
+            string codigo = "123456";
+
+            bool resultado = GestorCorreo.EnviarCorreo(correo, codigo);
+
+            Assert.IsFalse(resultado, "El método envió un correo aunque la dirección es inválida.");
+        }
+        [TestMethod]
+        public void EnviarCorreo_CorreoNulo()
+        {
+            string correo = null;
+            string codigo = "123456"; 
+
+            bool resultado = GestorCorreo.EnviarCorreo(correo, codigo);
+
+            Assert.IsFalse(resultado, "El método envió un correo aunque el correo es nulo.");
         }
     }
 }
