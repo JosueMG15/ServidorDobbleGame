@@ -38,11 +38,11 @@ namespace DobbleServicio
             });
         }
 
-        public RespuestaServicio<bool> ExisteCorreoAsociado(string correo)
+        public RespuestaServicio<bool> ExisteCorreoAsociado(string correoUsuario)
         {
             return GestorErrores.Ejecutar(() =>
             {
-                return RegistroUsuario.ExisteCorreoAsociado(correo);
+                return RegistroUsuario.ExisteCorreoAsociado(correoUsuario);
             });
         }
 
@@ -77,7 +77,7 @@ namespace DobbleServicio
             return respuestaServicio;
         }
 
-        public RespuestaServicio<CuentaUsuario> IniciarSesionInvitado(string nombreUsuario, byte[] fotoUsuario)
+        public RespuestaServicio<CuentaUsuario> IniciarSesionInvitado(string nombreUsuario, byte[] foto)
         {
             RespuestaServicio<CuentaUsuario> respuestaServicio = new RespuestaServicio<CuentaUsuario>();
             respuestaServicio.Exitoso = false;
@@ -91,7 +91,7 @@ namespace DobbleServicio
                     cuentaInvitado = new CuentaUsuario()
                     {
                         Usuario = nombreUsuario,
-                        Foto = fotoUsuario,
+                        Foto = foto,
                         ContextoOperacion = OperationContext.Current
                     };
 
@@ -148,13 +148,13 @@ namespace DobbleServicio
                 return exito;
             });
         }*/
-        public RespuestaServicio<bool> ModificarNombreUsuario(int idUsuario, string nombreUsuario)
+        public RespuestaServicio<bool> ModificarNombreUsuario(int idCuenta, string nombreUsuario)
         {
             return GestorErrores.Ejecutar(() =>
             {
-                bool exito = ModificarUsuario.ModificarNombreUsuario(idUsuario, nombreUsuario);
+                bool exito = ModificarUsuario.ModificarNombreUsuario(idCuenta, nombreUsuario);
 
-                var cuentaUsuario = UsuariosActivos.Values.FirstOrDefault(c => c.IdCuentaUsuario == idUsuario);
+                var cuentaUsuario = UsuariosActivos.Values.FirstOrDefault(c => c.IdCuentaUsuario == idCuenta);
 
                 if (exito && cuentaUsuario != null)
                 {
@@ -190,11 +190,11 @@ namespace DobbleServicio
         }
 
 
-        public RespuestaServicio<bool> ModificarContraseñaUsuario(int idUsuario, String contraseñaUsuario)
+        public RespuestaServicio<bool> ModificarContraseñaUsuario(int idCuenta, String contraseñaUsuario)
         {
             return GestorErrores.Ejecutar(() =>
             {
-                return ModificarUsuario.ModificarContraseñaUsuario(idUsuario, contraseñaUsuario);
+                return ModificarUsuario.ModificarContraseñaUsuario(idCuenta, contraseñaUsuario);
             });
         }
 
@@ -222,11 +222,11 @@ namespace DobbleServicio
             });
         }
 
-        public RespuestaServicio<bool> ValidarContraseña(int idUsuario, String contraseñaIngresada)
+        public RespuestaServicio<bool> ValidarContraseña(int idCuenta, string contraseñaUsuario)
         {
             return GestorErrores.Ejecutar(() =>
             {
-                return ModificarUsuario.ValidarContraseña(idUsuario, contraseñaIngresada);
+                return ModificarUsuario.ValidarContraseña(idCuenta, contraseñaUsuario);
             });
         }
 
@@ -331,9 +331,9 @@ namespace DobbleServicio
             }
         }
 
-        public bool CrearNuevaSala(string nombreAnfitrion, string codigoSala)
+        public bool CrearNuevaSala(string nombreUsuario, string codigoSala)
         {
-            if (string.IsNullOrEmpty(nombreAnfitrion) || string.IsNullOrEmpty(codigoSala))
+            if (string.IsNullOrEmpty(nombreUsuario) || string.IsNullOrEmpty(codigoSala))
             {
                 return false;
             }
@@ -452,6 +452,12 @@ namespace DobbleServicio
                     lock (sala.BloqueoSala)
                     {
                         var usuario = sala.Jugadores.FirstOrDefault(j => j.Usuario == nombreUsuario);
+
+                        if (usuario == null)
+                        {
+                            return;
+                        }
+
                         usuario.EstaListo = true;
 
                         foreach (var jugador in sala.Jugadores.ToList())
@@ -785,47 +791,46 @@ namespace DobbleServicio
 
         public bool AbandonarPartida(string nombreUsuario, string codigoSala)
         {
-            if (salas.TryGetValue(codigoSala, out Sala sala))
+            if (!salas.TryGetValue(codigoSala, out Sala sala))
             {
-                return GestorErrores.EjecutarConManejoDeExcepciones(() =>
-                {
-                    lock (sala.PartidaSala.BloqueoPartida)
-                    {
-                        Jugador jugador = sala.PartidaSala.JugadoresEnPartida.FirstOrDefault(j => j.Usuario.Equals(nombreUsuario));
-                        if (jugador == null)
-                        {
-                            return false;
-                        }
-
-                        bool esAnfitrion = jugador.EsAnfitrion;
-
-                        sala.PartidaSala.JugadoresEnPartida.Remove(jugador);
-
-                        if (sala.PartidaSala.JugadoresEnPartida.Count == 0 && sala.Jugadores.Count == 0)
-                        {
-                            salas.TryRemove(codigoSala, out _);
-                        }
-                        else
-                        {
-                            if (esAnfitrion)
-                            {
-                                AsignarNuevoAnfitrionDesdePartida(sala, jugador.Usuario);
-                            }
-
-                            if (sala.PartidaSala.JugadoresEnPartida.Count == 1)
-                            {
-                                NotificarFinDePartida(sala);
-                            }
-
-                            NotificarActualizacionDeJugadoresEnPartida(codigoSala);
-                        }
-
-                        return true;
-                    }
-                }, false);
+                return false;
             }
 
-            return false;
+            return GestorErrores.EjecutarConManejoDeExcepciones(() =>
+            {
+                lock (sala.PartidaSala.BloqueoPartida)
+                {
+                    Jugador jugador = sala.PartidaSala.JugadoresEnPartida.FirstOrDefault(j => j.Usuario.Equals(nombreUsuario));
+                    if (jugador == null)
+                    {
+                        return false;
+                    }
+
+                    bool esAnfitrion = jugador.EsAnfitrion;
+                    sala.PartidaSala.JugadoresEnPartida.Remove(jugador);
+
+                    if (sala.PartidaSala.JugadoresEnPartida.Count == 0 && sala.Jugadores.Count == 0)
+                    {
+                        salas.TryRemove(codigoSala, out _);
+                    }
+                    else
+                    {
+                        if (esAnfitrion)
+                        {
+                            AsignarNuevoAnfitrionDesdePartida(sala, jugador.Usuario);
+                        }
+
+                        if (sala.PartidaSala.JugadoresEnPartida.Count == 1)
+                        {
+                            NotificarFinDePartida(sala);
+                        }
+
+                        NotificarActualizacionDeJugadoresEnPartida(codigoSala);
+                    }
+
+                    return true;
+                }
+            }, false);
         }
 
         public void RegresarASala(string nombreUsuario, string codigoSala)
@@ -924,7 +929,7 @@ namespace DobbleServicio
             {
                 jugador.CartaBloqueada = false;
                 NotificarUsuarioPartida(jugador, callback =>
-                    callback.AsignarCartaCentral(cartaCentral, cartasRestantes));
+                    callback.AsignarCartaCentral(cartaCentral, cartasRestantes + 1));
                 NotificarUsuarioPartida(jugador, callback => callback.DesbloquearCarta());
             });
         }
@@ -936,49 +941,59 @@ namespace DobbleServicio
 
         public void ValidarCarta(string nombreUsuario, string rutaIcono, string codigoSala)
         {
-            if (salas.TryGetValue(codigoSala, out Sala sala))
+            if (!salas.TryGetValue(codigoSala, out Sala sala))
             {
-                lock (sala.BloqueoSala)
+                return;
+            }
+
+            lock (sala.BloqueoSala)
+            {
+                GestorErrores.EjecutarConManejoDeExcepciones(() =>
                 {
-                    GestorErrores.EjecutarConManejoDeExcepciones(() =>
+                    Jugador jugador = sala.PartidaSala.JugadoresEnPartida.FirstOrDefault(j => j.Usuario == nombreUsuario);
+
+                    if (jugador == null)
                     {
-                        Carta cartaCentral = sala.PartidaSala.CartaCentral;
-                        Jugador jugador = sala.PartidaSala.JugadoresEnPartida.FirstOrDefault(j => j.Usuario == nombreUsuario);
+                        return;
+                    }
 
-                        if (cartaCentral.Iconos.Any(i => i.Ruta == rutaIcono))
+                    Carta cartaCentral = sala.PartidaSala.CartaCentral;
+                    if (cartaCentral.Iconos.Any(i => i.Ruta == rutaIcono))
+                    {
+                        ProcesarCartaValida(sala, jugador, cartaCentral);
+                    }
+                    else
+                    {
+                        jugador.CartaBloqueada = true;
+                        NotificarUsuarioPartida(jugador, callback => callback.BloquearCarta());
+
+                        if (TodosTienenCartaBloqueada(sala.PartidaSala.JugadoresEnPartida))
                         {
-                            jugador.PuntosEnPartida++;
-                            NotificarActualizacionDePuntosEnPartida(jugador.Usuario, jugador.PuntosEnPartida, sala);
-                            AsignarCartaJugador(jugador, cartaCentral);
-
-                            if (sala.PartidaSala.Cartas.Any())
-                            {
-                                AsignarCartaCentral(sala, sala.PartidaSala.Cartas.Dequeue(), sala.PartidaSala.Cartas.Count);
-                            }
-                            else
-                            {
-                                NotificarFinDePartida(sala);
-                            }
+                            AsignarNuevaCartaCentralOSalaFinalizada(sala);
                         }
-                        else
-                        {
-                            jugador.CartaBloqueada = true;
-                            NotificarUsuarioPartida(jugador, callback => callback.BloquearCarta());
+                    }
+                });
+            }
+        }
 
-                            if (TodosTienenCartaBloqueada(sala.PartidaSala.JugadoresEnPartida))
-                            {
-                                if (sala.PartidaSala.Cartas.Any())
-                                {
-                                    AsignarCartaCentral(sala, sala.PartidaSala.Cartas.Dequeue(), sala.PartidaSala.Cartas.Count);
-                                }
-                                else
-                                {
-                                    NotificarFinDePartida(sala);
-                                }
-                            }
-                        }
-                    });
-                }
+        private void ProcesarCartaValida(Sala sala, Jugador jugador, Carta cartaCentral)
+        {
+            jugador.PuntosEnPartida++;
+            NotificarActualizacionDePuntosEnPartida(jugador.Usuario, jugador.PuntosEnPartida, sala);
+            AsignarCartaJugador(jugador, cartaCentral);
+
+            AsignarNuevaCartaCentralOSalaFinalizada(sala);
+        }
+
+        private void AsignarNuevaCartaCentralOSalaFinalizada(Sala sala)
+        {
+            if (sala.PartidaSala.Cartas.Any())
+            {
+                AsignarCartaCentral(sala, sala.PartidaSala.Cartas.Dequeue(), sala.PartidaSala.Cartas.Count);
+            }
+            else
+            {
+                NotificarFinDePartida(sala);
             }
         }
 
@@ -1028,11 +1043,6 @@ namespace DobbleServicio
                     }
 
                     UsuariosActivos.AddOrUpdate(cuentaUsuario.Usuario, cuentaUsuario, (key, oldValue) => cuentaUsuario);
-                    /*
-                    foreach (var cliente in clientesConectados.Values)
-                    {
-                        cliente.NotificarCambio();
-                    }*/
                 }
 
                 return exito;
@@ -1082,14 +1092,6 @@ namespace DobbleServicio
             {
                 return GestorCorreo.EnviarCorreo(correo, codigo);
             });
-        }
-    }
-
-    public partial class ServicioImplementacion : IGestionServidor
-    {
-        public bool Ping(string nombreUsuario)
-        {
-            return UsuariosActivos.TryGetValue(nombreUsuario, out _);
         }
     }
 }

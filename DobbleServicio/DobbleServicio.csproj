@@ -51,7 +51,6 @@
     <Compile Include="IGestionJugador.cs" />
     <Compile Include="IGestionPartida.cs" />
     <Compile Include="IGestionSala.cs" />
-    <Compile Include="IGestionServidor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServicioImplementacion.cs" />
   </ItemGroup>
