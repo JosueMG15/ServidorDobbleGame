@@ -121,7 +121,7 @@ namespace DobbleServicio
             }
         }
 
-        public RespuestaServicio<bool> ModificarNombreUsuario(int idUsuario, string nombreUsuario)
+        public RespuestaServicio<bool> ModificarNombreUsuario(int idCuenta, string nombreUsuario)
         {
             return GestorErrores.Ejecutar(() =>
             {

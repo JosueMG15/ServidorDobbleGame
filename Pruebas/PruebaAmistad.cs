@@ -395,7 +395,7 @@ namespace Pruebas
         [TestMethod]
         public void ObtenerAmistad_Exitoso()
         {
-            int idAmistad = 27; 
+            int idAmistad = 28; 
 
             var amistad = GestorAmistad.ObtenerAmistad(idAmistad);
 
@@ -416,7 +416,7 @@ namespace Pruebas
         [TestMethod]
         public void ObtenerAmistad_DatosMapeadosCorrectos()
         {
-            int idAmistad = 27;
+            int idAmistad = 28;
 
             var amistad = GestorAmistad.ObtenerAmistad(idAmistad);
 
