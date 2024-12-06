@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Logica
 {
-    public class GestorCorreo
+    public static class GestorCorreo
     {
         public static bool EnviarCorreo(string correo, string codigo)
         {

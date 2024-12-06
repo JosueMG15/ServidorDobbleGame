@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Logica
 {
-    public class GestorAmistad
+    public static class GestorAmistad
     {
         public static bool EnviarSolicitudAmistad(int idUsuarioPrincipal, String nombreUsuarioAmigo)
         {

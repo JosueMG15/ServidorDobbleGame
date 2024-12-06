@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Logica
 {
-    public class ModificarUsuario
+    public static class ModificarUsuario
     {
         public static bool ModificarNombreUsuario(int idCuenta,  String nombreUsuario)
         {

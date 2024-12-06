@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Logica
 {
-    public class GeneradorCartas
+    public static class GeneradorCartas
     {
         private readonly static int semilla = (int)DateTime.Now.Ticks;
         private readonly static Random random = new Random(semilla);
@@ -104,7 +104,7 @@ namespace Logica
                     for (int k = 1; k <= TAMAÑO; k++)
                     {
                         int indice = (numSimbolosPorCarta + 1) + TAMAÑO * (k - 1)
-                            + (((i - 1) * (k - 1) + (j - 1))) % TAMAÑO;
+                            + ((i - 1) * (k - 1) + (j - 1)) % TAMAÑO;
                         carta.Add(indice);
                     }
                     cartas.Add(carta);
@@ -141,14 +141,13 @@ namespace Logica
                 Console.WriteLine($"Carta {numeroCarta}:");
                 foreach (var icono in cartaAlgoritmo)
                 {
-                    // Puedes imprimir la ruta del icono o un nombre representativo
                     if (icono <= iconos.Count)
                     {
                         Console.WriteLine($"- {iconos[icono - 1].Ruta}");
                         cartaDobble.Add(iconos[icono - 1]);
                     }
                 }
-                Console.WriteLine(); // Espacio entre cartas
+                Console.WriteLine();
                 cartasDobble.Add(new Carta(cartaDobble));
                 numeroCarta++;
             }

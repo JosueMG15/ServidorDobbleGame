@@ -42,5 +42,9 @@ namespace DobbleServicio
 
         [OperationContract]
         RespuestaServicio<CuentaUsuario> ObtenerUsuarioPorCorreo(string correo);
+        [OperationContract]
+        bool Ping(string nombreUsuario);
+        [OperationContract]
+        RespuestaServicio<int?> ObtenerPuntosUsuario(string nombreUsuario);
     }   
 }

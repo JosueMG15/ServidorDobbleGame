@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Logica
 {
-    public class RegistroUsuario
+    public static class RegistroUsuario
     {
         public static bool RegistrarUsuario(CuentaUsuario cuentaUsuario)
         {
