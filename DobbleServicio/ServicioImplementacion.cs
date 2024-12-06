@@ -119,36 +119,9 @@ namespace DobbleServicio
             {
                 Console.WriteLine($"El usuario {nombreUsuario} ha sido desconectado");
             }
-            else
-            {
-                Console.WriteLine($"No se encontró al usuario {nombreUsuario}");
-            }
         }
 
-        /*public RespuestaServicio<bool> ModificarNombreUsuario(int idUsuario, String nombreUsuario)
-        {
-            return GestorErrores.Ejecutar(() =>
-            {
-                bool exito = ModificarUsuario.ModificarNombreUsuario(idUsuario, nombreUsuario);
-
-                var cuentaUsuario = UsuariosActivos.Values.FirstOrDefault(c => c.IdCuentaUsuario == idUsuario);
-                if (exito && cuentaUsuario != null)
-                {
-                    cuentaUsuario.Usuario = nombreUsuario;
-                    UsuariosActivos.AddOrUpdate(nombreUsuario, cuentaUsuario, (key, odlValue) => cuentaUsuario);
-
-                    // Itera sobre todos los clientes conectados
-                    foreach (var cliente in clientesConectados.Values)
-                    {
-                        // Llama al método de callback para notificar a cada cliente
-                        cliente.NotificarCambio();
-                    }
-                }
-
-                return exito;
-            });
-        }*/
-        public RespuestaServicio<bool> ModificarNombreUsuario(int idCuenta, string nombreUsuario)
+        public RespuestaServicio<bool> ModificarNombreUsuario(int idUsuario, string nombreUsuario)
         {
             return GestorErrores.Ejecutar(() =>
             {
@@ -681,11 +654,13 @@ namespace DobbleServicio
             });
         }
 
-        public void NotificarCambios()
+        public void NotificarCambios(string nombreUsuario)
         {
-            foreach (var cliente in clientesConectados.Values)
+            var clientesFiltrados = clientesConectados.Where(c => c.Key != nombreUsuario);
+
+            foreach (var cliente in clientesFiltrados)
             {
-                cliente.NotificarCambio();
+                cliente.Value.NotificarCambio();
             }
         }
 

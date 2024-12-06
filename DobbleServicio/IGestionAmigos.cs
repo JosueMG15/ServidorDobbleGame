@@ -48,7 +48,7 @@ namespace DobbleServicio
         void ReestablecerInvitacionPendiente(string nombreUsuario);
 
         [OperationContract]
-        void NotificarCambios();
+        void NotificarCambios(string nombreUsuario);
 
         [OperationContract]
         void NotificarDesconexion(string nombreUsuario);
