@@ -194,5 +194,40 @@ namespace Pruebas
 
             Assert.IsNull(puntos, "El método no devolvió null como se esperaba para un usuario inexistente.");
         }
+
+        [TestMethod]
+        public void ObtenerUsuarioPorCorreo_UsuarioEncontrado_DevuelveCuentaUsuario()
+        {
+            string correo = "erickutrera47@gmail.com";
+
+            var resultado = RegistroUsuario.ObtenerUsuarioPorCorreo(correo);
+
+            Assert.IsNotNull(resultado, "El método debería devolver un objeto CuentaUsuario para un correo válido.");
+            Assert.AreEqual(correo, resultado.Correo, "El correo devuelto no coincide.");
+            Assert.IsFalse(string.IsNullOrEmpty(resultado.Usuario), "El nombre de usuario no debería estar vacío.");
+        }
+        [TestMethod]
+        public void ObtenerUsuarioPorCorreo_NoExisteElCorreo()
+        {
+            string correo = "noexiste@ejemplo.com";
+
+            var resultado = RegistroUsuario.ObtenerUsuarioPorCorreo(correo);
+
+            Assert.IsNull(resultado, "El método debería devolver null para un correo que no existe.");
+        }
+        [TestMethod]
+        public void ObtenerUsuarioPorCorreo_DatosNulos()
+        {
+            string correoVacio = "";
+            var resultadoVacio = RegistroUsuario.ObtenerUsuarioPorCorreo(correoVacio);
+            Assert.IsNull(resultadoVacio, "El método debería devolver null para un correo vacío.");
+
+            string correoNulo = null;
+            var resultadoNulo = RegistroUsuario.ObtenerUsuarioPorCorreo(correoNulo);
+            Assert.IsNull(resultadoNulo, "El método debería devolver null para un correo nulo.");
+        }
+
+
+
     }
 }
