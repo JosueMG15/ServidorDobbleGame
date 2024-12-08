@@ -95,7 +95,8 @@ namespace Pruebas
                 Contraseña = "ContraseñaPrueba",
                 Foto = null
             };
-            Assert.IsFalse(RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuarioValoresNulos), "El método registra un correo aunque tenga datos inválidos, como datos nulos");
+            Assert.IsFalse(RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuarioValoresNulos), 
+                "El método registra un correo aunque tenga datos inválidos, como datos nulos");
         }
 
         [TestMethod]
@@ -108,7 +109,8 @@ namespace Pruebas
                 Contraseña = null,
                 Foto = null
             };
-            Assert.IsFalse(RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuarioValoresNulos), "El método registra un correo aunque tenga datos nulos");
+            Assert.IsFalse(RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuarioValoresNulos), 
+                "El método registra un correo aunque tenga datos nulos");
         }
 
 
@@ -165,7 +167,8 @@ namespace Pruebas
             string nombreUsuario = "osopanda";
             int puntosGanados = 10;
 
-            Assert.IsTrue(RegistroUsuario.RegistrarPuntosGanados(nombreUsuario, puntosGanados), "El método no esta registrando los puntos correctamente");
+            Assert.IsTrue(RegistroUsuario.RegistrarPuntosGanados(nombreUsuario, puntosGanados), 
+                "El método no esta registrando los puntos correctamente");
         }
 
         [TestMethod]
@@ -174,7 +177,8 @@ namespace Pruebas
             string nombreUsuario = "usuarioInexistente";
             int puntosGanados = 10;
 
-            Assert.IsFalse(RegistroUsuario.RegistrarPuntosGanados(nombreUsuario, puntosGanados), "El método esta registrando puntos a un usuario que no existe");
+            Assert.IsFalse(RegistroUsuario.RegistrarPuntosGanados(nombreUsuario, puntosGanados), 
+                "El método esta registrando puntos a un usuario que no existe");
         }
 
         [TestMethod]

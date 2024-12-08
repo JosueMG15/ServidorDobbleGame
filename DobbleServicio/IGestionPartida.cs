@@ -27,6 +27,8 @@ namespace DobbleServicio
         void ValidarCarta(string nombreUsuario, string rutaIcono, string codigoSala);
         [OperationContract]
         RespuestaServicio<bool> GuardarPuntosJugador(string nombreJugador, int puntosGanados);
+        [OperationContract]
+        bool GuardarPuntosJugadorInvitado(string nombreJugador, int puntosGanados);
         [OperationContract(IsOneWay = true)]
         void RegresarASala(string nombreUsuario, string codigoSala);
     }

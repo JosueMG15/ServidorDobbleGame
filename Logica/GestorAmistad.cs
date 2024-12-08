@@ -65,8 +65,8 @@ namespace Logica
                 // Mapeo manual de DataAccess.Amistad a Logica.Amistad
                 var solicitudesPendientesLogica = solicitudesPendientes.Select(a => new Logica.Amistad
                 {
-                    idAmistad = a.idAmistad,
-                    estadoSolicitud = a.estadoSolicitud ?? false,
+                    IdAmistad = a.idAmistad,
+                    EstadoSolicitud = a.estadoSolicitud ?? false,
                     UsuarioPrincipalId = a.UsuarioPrincipalId,
                     UsuarioAmigoId = a.UsuarioAmigoId
                     // Agrega otras propiedades si es necesario
@@ -173,8 +173,8 @@ namespace Logica
 
                 var amistadesLogica = amistades.Select(a => new Logica.Amistad
                 {
-                    idAmistad = a.idAmistad,
-                    estadoSolicitud = a.estadoSolicitud ?? true,
+                    IdAmistad = a.idAmistad,
+                    EstadoSolicitud = a.estadoSolicitud ?? true,
                     UsuarioPrincipalId = a.UsuarioPrincipalId,
                     UsuarioAmigoId = a.UsuarioAmigoId
 
@@ -198,8 +198,8 @@ namespace Logica
 
                 var amistadLogica = new Logica.Amistad
                 {
-                    idAmistad = amistad.idAmistad,
-                    estadoSolicitud = amistad.estadoSolicitud ?? true,
+                    IdAmistad = amistad.idAmistad,
+                    EstadoSolicitud = amistad.estadoSolicitud ?? true,
                     UsuarioPrincipalId = amistad.UsuarioPrincipalId,
                     UsuarioAmigoId = amistad.UsuarioAmigoId
                 };
@@ -223,8 +223,8 @@ namespace Logica
 
                 var amistadLogica = new Logica.Amistad
                 {
-                    idAmistad = amistad.idAmistad,
-                    estadoSolicitud = amistad.estadoSolicitud ?? false,
+                    IdAmistad = amistad.idAmistad,
+                    EstadoSolicitud = amistad.estadoSolicitud ?? false,
                     UsuarioPrincipalId = amistad.UsuarioPrincipalId,
                     UsuarioAmigoId = amistad.UsuarioAmigoId
                 };

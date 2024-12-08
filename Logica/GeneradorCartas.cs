@@ -8,10 +8,10 @@ namespace Logica
 {
     public static class GeneradorCartas
     {
-        private readonly static int semilla = (int)DateTime.Now.Ticks;
-        private readonly static Random random = new Random(semilla);
-        private const int TAMAÑO = 2;
-        private readonly static int numSimbolosPorCarta = TAMAÑO + 1;
+        private readonly static int _semilla = (int)DateTime.Now.Ticks;
+        private readonly static Random _random = new Random(_semilla);
+        private const int TAMAÑO = 7;
+        private readonly static int _numSimbolosPorCarta = TAMAÑO + 1;
 
         private static List<Icono> InicializarIconos()
         {
@@ -103,7 +103,7 @@ namespace Logica
                     List<int> carta = new List<int> { i + 1 };
                     for (int k = 1; k <= TAMAÑO; k++)
                     {
-                        int indice = (numSimbolosPorCarta + 1) + TAMAÑO * (k - 1)
+                        int indice = (_numSimbolosPorCarta + 1) + TAMAÑO * (k - 1)
                             + ((i - 1) * (k - 1) + (j - 1)) % TAMAÑO;
                         carta.Add(indice);
                     }
@@ -120,7 +120,7 @@ namespace Logica
             while (numeroIconos > 1)
             {
                 numeroIconos--;
-                int i = random.Next(numeroIconos + 1);
+                int i = _random.Next(numeroIconos + 1);
                 T icono = lista[i];
                 lista[i] = lista[numeroIconos];
                 lista[numeroIconos] = icono;

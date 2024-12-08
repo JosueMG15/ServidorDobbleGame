@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity.Core;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.ServiceModel;
@@ -35,6 +36,11 @@ namespace Logica
             catch (EntityException ex)
             {
                 Registro.Error($"Excepción de EntityException: {ex.Message}. " +
+                    $"\nTraza: {ex.StackTrace}. \nFuente: {ex.Source}.");
+            }
+            catch (SqlException ex)
+            {
+                Registro.Error($"Excepción de SQL Server: {ex.Message}." +
                     $"\nTraza: {ex.StackTrace}. \nFuente: {ex.Source}.");
             }
             catch (Exception ex)

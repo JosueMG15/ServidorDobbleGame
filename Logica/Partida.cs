@@ -16,6 +16,7 @@ namespace Logica
         [DataMember]
         public Queue<Carta> Cartas { get; set; }
         public Carta CartaCentral { get; set; }
+        public bool EstaEnCurso { get; set; } = true;
 
         public Partida()
         {

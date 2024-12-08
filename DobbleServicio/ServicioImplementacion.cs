@@ -69,6 +69,7 @@ namespace DobbleServicio
                     cuentaUsuario = respuestaServicio.Resultado;
                     cuentaUsuario.ContextoOperacion = OperationContext.Current;
                     cuentaUsuario.Estado = true;
+                    cuentaUsuario.EsInvitado = false;
 
                     UsuariosActivos.AddOrUpdate(nombreUsuario, cuentaUsuario, (llave, valorExistente) => cuentaUsuario);
                 }
@@ -92,6 +93,7 @@ namespace DobbleServicio
                     {
                         Usuario = nombreUsuario,
                         Foto = foto,
+                        EsInvitado = true,
                         ContextoOperacion = OperationContext.Current
                     };
 
@@ -117,7 +119,7 @@ namespace DobbleServicio
 
             if (UsuariosActivos.TryRemove(nombreUsuario, out CuentaUsuario cuentaUsuario))
             {
-                Console.WriteLine($"El usuario {nombreUsuario} ha sido desconectado");
+                Registro.Informacion($"El usuario {nombreUsuario} ha sido desconectado");
             }
         }
 
@@ -243,18 +245,18 @@ namespace DobbleServicio
                         return false;
                     }
 
+                    sala.Jugadores.Remove(cuentaUsuario);
+
                     if (sala.Jugadores.Count > 1)
                     {
                         AsignarNuevoAnfitrion(sala, nombreUsuario);
                     }
 
-                    sala.Jugadores.Remove(cuentaUsuario);
-
                     return sala.Jugadores.Count == 0 && salas.TryRemove(codigoSala, out _);
                 }
             }, false);
 
-            if (resultado && salas.ContainsKey(codigoSala))
+            if (!resultado && salas.ContainsKey(codigoSala))
             {
                 EnviarMensajeConexionSala(nombreUsuario, codigoSala, mensaje);
                 NotificarUsuarioConectado(codigoSala);
@@ -272,16 +274,20 @@ namespace DobbleServicio
 
             bool resultado = GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
-                Jugador usuarioAExpulsar = sala.Jugadores.Find(u => u.Usuario == nombreUsuario);
-                if (usuarioAExpulsar == null)
+                lock (sala.BloqueoSala)
                 {
-                    return false;
+                    Jugador usuarioAExpulsar = sala.Jugadores.Find(u => u.Usuario == nombreUsuario);
+                    if (usuarioAExpulsar == null)
+                    {
+                        return false;
+                    }
+
+                    sala.Jugadores.Remove(usuarioAExpulsar);
+
+                    NotificarUsuarioSala(usuarioAExpulsar, callback => callback.NotificarExpulsionAJugador());
+
+                    return true;
                 }
-
-                NotificarUsuarioSala(usuarioAExpulsar, callback => callback.NotificarExpulsionAJugador());
-
-                sala.Jugadores.Remove(usuarioAExpulsar);
-                return true;
             }, false);
 
             if (resultado && salas.ContainsKey(codigoSala))
@@ -344,7 +350,10 @@ namespace DobbleServicio
 
                     foreach (var jugador in sala.Jugadores.ToList())
                     {
-                        NotificarUsuarioSala(jugador, callback => callback.MostrarMensajeSala(respuesta));
+                        if (EstaConectadoEnSala(jugador))
+                        {
+                            NotificarUsuarioSala(jugador, callback => callback.MostrarMensajeSala(respuesta));
+                        }
                     }
                 }
             }
@@ -412,19 +421,25 @@ namespace DobbleServicio
 
         public void NotificarUsuarioConectado(string codigoSala)
         {
-            GestorErrores.EjecutarConManejoDeExcepciones(() =>
+            if (salas.TryGetValue(codigoSala, out Sala sala))
             {
-                if (salas.TryGetValue(codigoSala, out Sala sala))
+                ActualizarUsuariosEnSala(sala);
+            }
+        }
+
+        public static void ActualizarUsuariosEnSala(Sala sala)
+        {
+            lock (sala.BloqueoSala)
+            {
+                GestorErrores.EjecutarConManejoDeExcepciones(() =>
                 {
-                    lock (sala.BloqueoSala)
+                    Parallel.ForEach(sala.Jugadores, jugador =>
                     {
-                        foreach (var jugador in sala.Jugadores.ToList())
-                        {
-                            NotificarUsuarioSala(jugador, callback => callback.ActualizarUsuariosConectados(sala.Jugadores));
-                        }
-                    }
-                }
-            });
+                        NotificarUsuarioSala(jugador, callback =>
+                            callback.ActualizarUsuariosConectados(sala.Jugadores));
+                    });
+                });
+            }
         }
 
         public void NotificarJugadorListo(string nombreUsuario, string codigoSala)
@@ -474,6 +489,7 @@ namespace DobbleServicio
                 {
                     lock (sala.BloqueoSala)
                     {
+                        sala.Disponible = false;
                         foreach (var jugador in sala.Jugadores.ToList())
                         {
                             if (!jugador.EsAnfitrion)
@@ -484,6 +500,22 @@ namespace DobbleServicio
                     }
                 }
             });
+        }
+
+        private static bool EstaConectadoEnSala(Jugador jugador)
+        {
+            return GestorErrores.EjecutarConManejoDeExcepciones(() =>
+            {
+                if (jugador.ContextoOperacion != null)
+                {
+                    var callback = jugador.ContextoOperacion.GetCallbackChannel<ISalaCallback>();
+                    if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                    {
+                        return callback.PingSala();
+                    }
+                }
+                return false;
+            }, false);
         }
 
         private static void NotificarUsuarioSala(Jugador jugador, Action<ISalaCallback> accion)
@@ -522,6 +554,7 @@ namespace DobbleServicio
     {
         private readonly ConcurrentDictionary<string, IGestionAmigosCallback> clientesConectados =
             new ConcurrentDictionary<string, IGestionAmigosCallback>();
+        private readonly object bloqueoGestionAmigos = new object();
 
         public RespuestaServicio<bool> AmistadYaExiste(int idUsuarioPrincipal, String nombreUsuarioAmigo)
         {
@@ -551,22 +584,26 @@ namespace DobbleServicio
 
         public RespuestaServicio<bool> EliminarAmistad(int idAmistad, String nombreUsuario, String nombreUsuarioAmigo)
         {
-            return GestorErrores.Ejecutar(() =>
+            lock (bloqueoGestionAmigos)
             {
-                bool eliminacionDeAmistad = GestorAmistad.EliminarAmistad(idAmistad);
-
-                if(nombreUsuario != null && eliminacionDeAmistad && clientesConectados.TryGetValue(nombreUsuario, out var callback))
+                return GestorErrores.Ejecutar(() =>
                 {
-                    callback.NotificarCambio();
-                }
+                    bool eliminacionDeAmistad = GestorAmistad.EliminarAmistad(idAmistad);
 
-                if (nombreUsuarioAmigo != null & eliminacionDeAmistad && clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callbackAmigo))
-                {
-                    callbackAmigo.NotificarCambio();
-                }
+                    if (nombreUsuario != null && eliminacionDeAmistad && clientesConectados.TryGetValue(nombreUsuario, out var callback))
+                    {
+                        callback.NotificarCambio();
+                    }
 
-                return eliminacionDeAmistad;
-            });
+                    if (nombreUsuarioAmigo != null & eliminacionDeAmistad && 
+                    clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callbackAmigo))
+                    {
+                        callbackAmigo.NotificarCambio();
+                    }
+
+                    return eliminacionDeAmistad;
+                });
+            }
         }
 
         public RespuestaServicio<bool> AceptarSolicitud(int idAmistad, String nombreUsuarioAmigo)
@@ -616,17 +653,20 @@ namespace DobbleServicio
 
         public RespuestaServicio<bool> EnviarSolicitudAmistad(int idUsuarioPrincipal, string nombreUsuarioAmigo)
         {
-            return GestorErrores.Ejecutar(() =>
+            lock (bloqueoGestionAmigos)
             {
-                bool solicitudEnviada = GestorAmistad.EnviarSolicitudAmistad(idUsuarioPrincipal, nombreUsuarioAmigo);
-
-                if (solicitudEnviada && clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callback))
+                return GestorErrores.Ejecutar(() =>
                 {
-                    callback.NotificarSolicitudAmistad();
-                }
+                    bool solicitudEnviada = GestorAmistad.EnviarSolicitudAmistad(idUsuarioPrincipal, nombreUsuarioAmigo);
 
-                return solicitudEnviada;
-            });
+                    if (solicitudEnviada && clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callback))
+                    {
+                        callback.NotificarSolicitudAmistad();
+                    }
+
+                    return solicitudEnviada;
+                });
+            }
         }
 
         public void ConectarCliente(string nombreUsuario)
@@ -725,7 +765,6 @@ namespace DobbleServicio
                     {
                         var partida = new Partida();
                         sala.PartidaSala = partida;
-                        sala.Disponible = false;
                     }
                     return true;
                 }
@@ -786,7 +825,7 @@ namespace DobbleServicio
 
                         NotificarActualizacionDeJugadoresEnPartida(codigoSala);
 
-                        if (sala.PartidaSala.JugadoresEnPartida.Count == 1)
+                        if (sala.PartidaSala.JugadoresEnPartida.Count == 1 && sala.PartidaSala.EstaEnCurso)
                         {
                             NotificarFinDePartida(sala);
                         }
@@ -828,20 +867,24 @@ namespace DobbleServicio
             {
                 GestorErrores.EjecutarConManejoDeExcepciones(() =>
                 {
-                    var nuevoAnfitrion = sala.PartidaSala.JugadoresEnPartida.Find(u => u.Usuario != usuarioActual);
-                    if (nuevoAnfitrion != null)
+                    if (sala != null)
                     {
-                        nuevoAnfitrion.EsAnfitrion = true;
-                        NotificarUsuarioPartida(nuevoAnfitrion, callback => callback.ConvertirEnAnfitrionDesdePartida());
-                    }
-                    else
-                    {
-                        nuevoAnfitrion = sala.Jugadores.Find(u => u.Usuario != usuarioActual);
-
+                        var nuevoAnfitrion = sala.PartidaSala.JugadoresEnPartida.Find(u => u.Usuario != usuarioActual);
                         if (nuevoAnfitrion != null)
                         {
                             nuevoAnfitrion.EsAnfitrion = true;
-                            NotificarUsuarioSala(nuevoAnfitrion, callback => callback.ConvertirEnAnfitrion(nuevoAnfitrion.Usuario));
+                            NotificarUsuarioPartida(nuevoAnfitrion, callback => callback.ConvertirEnAnfitrionDesdePartida());
+                        }
+                        else
+                        {
+                            nuevoAnfitrion = sala.Jugadores.Find(u => u.Usuario != usuarioActual);
+
+                            if (nuevoAnfitrion != null)
+                            {
+                                nuevoAnfitrion.EsAnfitrion = true;
+                                NotificarUsuarioSala(nuevoAnfitrion, callback => callback.ConvertirEnAnfitrion(nuevoAnfitrion.Usuario));
+                                ActualizarUsuariosEnSala(sala);
+                            }
                         }
                     }
                 });
@@ -982,6 +1025,7 @@ namespace DobbleServicio
         {
             GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
+                sala.PartidaSala.EstaEnCurso = false;
                 Parallel.ForEach(sala.PartidaSala.JugadoresEnPartida, jugador =>
                 {
                     NotificarUsuarioPartida(jugador, callback => callback.FinalizarPartida());
@@ -1005,11 +1049,26 @@ namespace DobbleServicio
                         cuentaUsuario.Puntaje = puntaje.Value;
                     }
 
-                    UsuariosActivos.AddOrUpdate(cuentaUsuario.Usuario, cuentaUsuario, (key, oldValue) => cuentaUsuario);
+                    UsuariosActivos.AddOrUpdate(cuentaUsuario.Usuario, cuentaUsuario, (llave, valorExistente) => cuentaUsuario);
                 }
 
                 return exito;
             });
+        }
+
+        public bool GuardarPuntosJugadorInvitado(string nombreJugador, int puntosGanados)
+        {
+            return GestorErrores.EjecutarConManejoDeExcepciones(() =>
+            {
+                var cuentaUsuario = UsuariosActivos.Values.FirstOrDefault(c => c.Usuario == nombreJugador);
+                if (cuentaUsuario != null)
+                {
+                    cuentaUsuario.Puntaje += puntosGanados;
+                }
+
+                UsuariosActivos.AddOrUpdate(cuentaUsuario.Usuario, cuentaUsuario, (llave, valorExistente) => cuentaUsuario);
+                return true;
+            }, false);
         }
     
 

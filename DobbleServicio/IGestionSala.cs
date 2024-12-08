@@ -60,5 +60,7 @@ namespace DobbleServicio
         void MostrarJugadorListo(string nombreUsuario, bool estaListo);
         [OperationContract(IsOneWay = true)]
         void CambiarVentana();
+        [OperationContract]
+        bool PingSala();
     }
 }

@@ -11,10 +11,10 @@ namespace Logica
     public class Amistad
     {
         [DataMember]
-        public int idAmistad { get; set; }
+        public int IdAmistad { get; set; }
 
         [DataMember]
-        public bool estadoSolicitud { get; set; }
+        public bool EstadoSolicitud { get; set; }
 
         [DataMember]
         public int UsuarioPrincipalId { get; set; }

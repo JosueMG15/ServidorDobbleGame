@@ -46,5 +46,5 @@ namespace DobbleServicio
         bool Ping(string nombreUsuario);
         [OperationContract]
         RespuestaServicio<int?> ObtenerPuntosUsuario(string nombreUsuario);
-    }   
+    }
 }

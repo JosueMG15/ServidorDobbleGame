@@ -332,7 +332,8 @@ namespace Pruebas
                     bool resultado = GestorAmistad.EliminarAmistad(idAmistad);
 
                     Assert.IsTrue(resultado, "La amistad debería haberse eliminado correctamente.");
-                    Assert.IsNull(contexto.Amistad.FirstOrDefault(a => a.idAmistad == idAmistad), "La amistad debería estar eliminada de la base de datos.");
+                    Assert.IsNull(contexto.Amistad.FirstOrDefault(a => a.idAmistad == idAmistad), 
+                        "La amistad debería estar eliminada de la base de datos.");
 
                     contexto.Amistad.Add(amistadCopia);
                     contexto.SaveChanges();
@@ -368,7 +369,7 @@ namespace Pruebas
 
             Assert.IsNotNull(amistades, "La lista de amistades no debería ser nula.");
             Assert.IsTrue(amistades.Count > 1, "El usuario debería tener más de una amistad aceptada.");
-            Assert.IsTrue(amistades.All(a => a.estadoSolicitud == true), "Todas las amistades devueltas deberían estar aceptadas.");
+            Assert.IsTrue(amistades.All(a => a.EstadoSolicitud == true), "Todas las amistades devueltas deberían estar aceptadas.");
         }
         [TestMethod]
         public void ObtenerAmistades_ListaVacia()
@@ -400,7 +401,7 @@ namespace Pruebas
             var amistad = GestorAmistad.ObtenerAmistad(idAmistad);
 
             Assert.IsNotNull(amistad, "La amistad no debería ser nula para un ID válido.");
-            Assert.AreEqual(idAmistad, amistad.idAmistad, "El ID de la amistad devuelta debería coincidir con el solicitado.");
+            Assert.AreEqual(idAmistad, amistad.IdAmistad, "El ID de la amistad devuelta debería coincidir con el solicitado.");
         }
 
         [TestMethod]
@@ -421,8 +422,8 @@ namespace Pruebas
             var amistad = GestorAmistad.ObtenerAmistad(idAmistad);
 
             Assert.IsNotNull(amistad, "La amistad no debería ser nula para un ID válido.");
-            Assert.AreEqual(idAmistad, amistad.idAmistad, "El ID de la amistad debería coincidir.");
-            Assert.IsTrue(amistad.estadoSolicitud, "El estado de la solicitud debería ser verdadero.");
+            Assert.AreEqual(idAmistad, amistad.IdAmistad, "El ID de la amistad debería coincidir.");
+            Assert.IsTrue(amistad.EstadoSolicitud, "El estado de la solicitud debería ser verdadero.");
             Assert.IsTrue(amistad.UsuarioPrincipalId > 0, "El ID del usuario principal debería ser válido.");
             Assert.IsTrue(amistad.UsuarioAmigoId > 0, "El ID del usuario amigo debería ser válido.");
         }
@@ -435,7 +436,7 @@ namespace Pruebas
 
             Assert.IsNotNull(ultimaAmistad, "El método debería devolver el último registro existente.");
 
-            Assert.IsTrue(ultimaAmistad.idAmistad > 0, "El ID de la amistad debería ser válido.");
+            Assert.IsTrue(ultimaAmistad.IdAmistad > 0, "El ID de la amistad debería ser válido.");
         }
 
         [TestMethod]
@@ -448,7 +449,8 @@ namespace Pruebas
                 var ultimaAmistad = GestorAmistad.ObtenerSolicitud();
 
                 Assert.IsNotNull(ultimaAmistad, "El método debería devolver el último registro existente.");
-                Assert.AreEqual(ultimoRegistroEsperado.idAmistad, ultimaAmistad.idAmistad, "El ID del registro devuelto debería coincidir con el último registro de la tabla.");
+                Assert.AreEqual(ultimoRegistroEsperado.idAmistad, ultimaAmistad.IdAmistad, 
+                    "El ID del registro devuelto debería coincidir con el último registro de la tabla.");
             }
         }
     }
