@@ -98,7 +98,6 @@ namespace Pruebas
             Assert.IsFalse(RegistroUsuario.RegistrarUsuario(nuevaCuentaUsuarioValoresNulos), 
                 "El método registra un correo aunque tenga datos inválidos, como datos nulos");
         }
-
         [TestMethod]
         public void RegistrarUsuario_CamposNulos()
         {
@@ -123,7 +122,6 @@ namespace Pruebas
             CuentaUsuario cuentaUsuarioExistente = RegistroUsuario.IniciarSesion(nombreUsuario, contraseña);
             Assert.IsNull(cuentaUsuarioExistente, "El método no retorna la cuenta del usuario aunque si existe");
         }
-
         [TestMethod]
         public void IniciarSesion_DatosIncorrectos()
         {
@@ -161,6 +159,7 @@ namespace Pruebas
             Assert.IsNull(cuentaUsuarioNula, "El método retorna una cuenta de usuario aunque esta sea nulo");
         }
 
+
         [TestMethod]
         public void RegistrarPuntosGanados_Exitoso()
         {
@@ -181,6 +180,7 @@ namespace Pruebas
                 "El método esta registrando puntos a un usuario que no existe");
         }
 
+
         [TestMethod]
         public void ObtenerPuntosUsuario_Exitoso()
         {
@@ -189,7 +189,6 @@ namespace Pruebas
 
             Assert.IsTrue(puntos >= 0, "El método devolvió un valor negativo, lo cual no es válido para los puntos del usuario.");
         }
-
         [TestMethod]
         public void ObtenerPuntosUsuario_UsuarioInexistente()
         {
@@ -198,6 +197,7 @@ namespace Pruebas
 
             Assert.IsNull(puntos, "El método no devolvió null como se esperaba para un usuario inexistente.");
         }
+
 
         [TestMethod]
         public void ObtenerUsuarioPorCorreo_UsuarioEncontrado_DevuelveCuentaUsuario()
@@ -230,8 +230,5 @@ namespace Pruebas
             var resultadoNulo = RegistroUsuario.ObtenerUsuarioPorCorreo(correoNulo);
             Assert.IsNull(resultadoNulo, "El método debería devolver null para un correo nulo.");
         }
-
-
-
     }
 }
