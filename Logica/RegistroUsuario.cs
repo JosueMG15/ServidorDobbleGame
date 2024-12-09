@@ -1,6 +1,7 @@
 ﻿using DataAccess;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -94,6 +95,27 @@ namespace Logica
             }
         }
 
+        public static async Task<bool> RegistrarPuntosGanadosAsync(string nombreUsuario, int puntosGanados)
+        {
+            using (var contexto = new DobbleBDEntidades())
+            {
+                var jugador = await (from cuenta in contexto.Cuenta
+                                     join usuario in contexto.Usuario
+                                     on cuenta.idCuenta equals usuario.idCuenta
+                                     where cuenta.nombreUsuario == nombreUsuario
+                                     select usuario).FirstOrDefaultAsync();
+
+                if (jugador != null)
+                {
+                    jugador.puntaje += puntosGanados;
+                    await contexto.SaveChangesAsync();
+                    return true;
+                }
+                return false;
+            }
+        }
+
+
         public static int? ObtenerPuntosUsuario(string nombreUsuario)
         {
             using (var contexto = new DobbleBDEntidades())
@@ -108,6 +130,21 @@ namespace Logica
                 return puntaje;
             }
         }
+
+        public static async Task<int?> ObtenerPuntosUsuarioAsync(string nombreUsuario)
+        {
+            using (var contexto = new DobbleBDEntidades())
+            {
+                var puntaje = await (from cuenta in contexto.Cuenta
+                                     join usuario in contexto.Usuario
+                                     on cuenta.idCuenta equals usuario.idCuenta
+                                     where cuenta.nombreUsuario == nombreUsuario
+                                     select usuario.puntaje).FirstOrDefaultAsync();
+
+                return puntaje;
+            }
+        }
+
 
         public static CuentaUsuario IniciarSesion(string nombreUsuario, string contraseña)
         {

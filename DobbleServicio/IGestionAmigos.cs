@@ -42,21 +42,11 @@ namespace DobbleServicio
 
         [OperationContract]
         RespuestaServicio<bool> UsuarioConectado(string nombreUsuario);
-        [OperationContract]
-        bool TieneInvitacionPendiente(string nombreUsuario);
-        [OperationContract]
-        void ReestablecerInvitacionPendiente(string nombreUsuario);
 
         [OperationContract]
         void NotificarCambios(string nombreUsuario);
 
         [OperationContract]
         void NotificarDesconexion(string nombreUsuario);
-
-        [OperationContract]
-        void NotificarBotonInvitacion(string nombreUsuario);
-
-        [OperationContract(IsOneWay = true)]
-        void NotificarInvitacion(string nombreUsuario, string nombreUsuarioInvitacion, string codigoSala);
     }
 }

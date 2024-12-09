@@ -337,7 +337,7 @@ namespace DobbleServicio
 
         public void EnviarMensajeSala(string nombreUsuario, string codigoSala, string mensaje)
         {
-            if (salas.TryGetValue(codigoSala, out Sala sala))
+            if (!salas.TryGetValue(codigoSala, out Sala sala))
             {
                 return;
             }
@@ -354,6 +354,7 @@ namespace DobbleServicio
                 }
 
                 var jugadoresConectados = sala.Jugadores.Where(EstaConectadoEnSala).ToList();
+                
 
                 foreach (var jugador in jugadoresConectados)
                 {
@@ -505,7 +506,7 @@ namespace DobbleServicio
             });
         }
 
-        private static bool EstaConectadoEnSala(Jugador jugador)
+        private bool EstaConectadoEnSala(Jugador jugador)
         {
             return GestorErrores.EjecutarConManejoDeExcepciones(() =>
             {
@@ -514,7 +515,17 @@ namespace DobbleServicio
                     var callback = jugador.ContextoOperacion.GetCallbackChannel<ISalaCallback>();
                     if (((ICommunicationObject)callback).State == CommunicationState.Opened)
                     {
-                        return callback.PingSala();
+                        var pingTask = Task.Run(() => callback.PingSala());
+                        if (pingTask.Wait(5000))
+                        {
+                            return pingTask.Result;
+                        }
+                        else
+                        {
+                            CerrarSesionJugador(jugador.Usuario, null);
+                            DesconectarCliente(jugador.Usuario);
+                            return false;
+                        }
                     }
                 }
                 return false;
@@ -535,6 +546,22 @@ namespace DobbleServicio
                 }
             });
         }
+
+        private static async Task NotificarUsuarioSalaAsync(Jugador jugador, Func<ISalaCallback, Task> accion)
+        {
+            await GestorErrores.EjecutarConManejoDeExcepcionesAsync(async () =>
+            {
+                if (jugador.ContextoOperacion != null)
+                {
+                    var callback = jugador.ContextoOperacion.GetCallbackChannel<ISalaCallback>();
+                    if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                    {
+                        await accion(callback);
+                    }
+                }
+            });
+        }
+
 
         public bool HayEspacioSala(string codigoSala)
         {
@@ -705,49 +732,8 @@ namespace DobbleServicio
                 cliente.NotificarSalida(nombreUsuario);
             }
         }
-
-        public void NotificarBotonInvitacion(string nombreUsuario)
-        {
-            foreach (var cliente in clientesConectados.Values)
-            {
-                cliente.NotificarInvitacionCambio(nombreUsuario);
-            }
-        }
-
-        public bool TieneInvitacionPendiente(string nombreUsuario)
-        {
-            return GestorErrores.EjecutarConManejoDeExcepciones(() =>
-            {
-                if (UsuariosActivos.TryGetValue(nombreUsuario, out CuentaUsuario usuario))
-                {
-                    return usuario.TieneInvitacionPendiente;
-                }
-                return false;
-            });
-        }
-
-        public void ReestablecerInvitacionPendiente(string nombreUsuario)
-        {
-            GestorErrores.EjecutarConManejoDeExcepciones(() =>
-            {
-                if (UsuariosActivos.TryGetValue(nombreUsuario, out CuentaUsuario cuentaUsuario))
-                {
-                    cuentaUsuario.TieneInvitacionPendiente = false;
-                }
-            });
-        }
-
-        public void NotificarInvitacion(string nombreUsuario, string nombreUsuarioInvitacion, string codigoSala)
-        {
-            if (clientesConectados.TryGetValue(nombreUsuario, out var callback) && 
-                UsuariosActivos.TryGetValue(nombreUsuario, out CuentaUsuario cuentaUsuario))
-            {
-                cuentaUsuario.TieneInvitacionPendiente = true;
-                callback.NotificarVentanaInvitacion(nombreUsuarioInvitacion, codigoSala);
-            }
-        }
     }
-
+    
     public partial class ServicioImplementacion : IGestionPartida
     {
         public bool CrearNuevaPartida(string codigoSala)
@@ -1105,6 +1091,7 @@ namespace DobbleServicio
             });
         }
     }
+    
 
     public partial class ServicioImplementacion : IGestionCorreos
     {
