@@ -200,7 +200,7 @@ namespace Pruebas
 
 
         [TestMethod]
-        public void ObtenerUsuarioPorCorreo_UsuarioEncontrado_DevuelveCuentaUsuario()
+        public void ObtenerUsuarioPorCorreo_Exitoso()
         {
             string correo = "erickutrera47@gmail.com";
 

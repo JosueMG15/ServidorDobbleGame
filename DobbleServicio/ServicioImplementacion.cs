@@ -250,6 +250,7 @@ namespace DobbleServicio
                     {
                         AsignarNuevoAnfitrion(sala, nombreUsuario);
                     }
+                    sala.Jugadores.Remove(cuentaUsuario);
 
                     sala.Jugadores.Remove(cuentaUsuario);
 
