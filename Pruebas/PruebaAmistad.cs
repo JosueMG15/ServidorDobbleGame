@@ -311,7 +311,7 @@ namespace Pruebas
 
 
         [TestMethod]
-        public void EliminarAmistad_AmistadExiste_Exito()
+        public void EliminarAmistad_Exitoso()
         {
             int idAmistad = 1; 
             DataAccess.Amistad amistadOriginal;
