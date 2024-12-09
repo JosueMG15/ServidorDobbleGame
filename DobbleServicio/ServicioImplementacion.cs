@@ -109,12 +109,13 @@ namespace DobbleServicio
 
         public void CerrarSesionJugador(string nombreUsuario, string mensaje)
         {
-            foreach (var sala in salas.Values)
+            var salasConUsuario = salas.Values
+                .Where(sala => sala.Jugadores.Exists(u => u.Usuario == nombreUsuario))
+                .ToList();
+
+            foreach (var sala in salasConUsuario)
             {
-                if (sala.Jugadores.Exists(u => u.Usuario == nombreUsuario))
-                {
-                    AbandonarSala(nombreUsuario, sala.CodigoSala, mensaje);
-                }
+                AbandonarSala(nombreUsuario, sala.CodigoSala, mensaje);
             }
 
             if (UsuariosActivos.TryRemove(nombreUsuario, out CuentaUsuario cuentaUsuario))
@@ -245,12 +246,12 @@ namespace DobbleServicio
                         return false;
                     }
 
-                    sala.Jugadores.Remove(cuentaUsuario);
-
                     if (sala.Jugadores.Count > 1)
                     {
                         AsignarNuevoAnfitrion(sala, nombreUsuario);
                     }
+
+                    sala.Jugadores.Remove(cuentaUsuario);
 
                     return sala.Jugadores.Count == 0 && salas.TryRemove(codigoSala, out _);
                 }
@@ -337,24 +338,25 @@ namespace DobbleServicio
         {
             if (salas.TryGetValue(codigoSala, out Sala sala))
             {
-                lock (sala.BloqueoSala)
+                return;
+            }
+
+            lock (sala.BloqueoSala)
+            {
+                var usuarioEmisor = sala.Jugadores.Find(u => u.Usuario.Equals(nombreUsuario));
+                string respuesta = usuarioEmisor != null ? $"{usuarioEmisor.Usuario}: {mensaje}" : string.Empty;
+
+                if (string.IsNullOrWhiteSpace(respuesta))
                 {
-                    var usuarioEmisor = sala.Jugadores.Find(u => u.Usuario.Equals(nombreUsuario));
-                    string respuesta = usuarioEmisor != null ? $"{usuarioEmisor.Usuario}: {mensaje}" : string.Empty;
+                    Console.WriteLine("No se pudo enviar un mensaje vacío");
+                    return;
+                }
 
-                    if (string.IsNullOrWhiteSpace(respuesta))
-                    {
-                        Console.WriteLine("No se pudo enviar un mensaje vacío");
-                        return;
-                    }
+                var jugadoresConectados = sala.Jugadores.Where(EstaConectadoEnSala).ToList();
 
-                    foreach (var jugador in sala.Jugadores.ToList())
-                    {
-                        if (EstaConectadoEnSala(jugador))
-                        {
-                            NotificarUsuarioSala(jugador, callback => callback.MostrarMensajeSala(respuesta));
-                        }
-                    }
+                foreach (var jugador in jugadoresConectados)
+                {
+                    NotificarUsuarioSala(jugador, callback => callback.MostrarMensajeSala(respuesta));
                 }
             }
         }
@@ -595,7 +597,7 @@ namespace DobbleServicio
                         callback.NotificarCambio();
                     }
 
-                    if (nombreUsuarioAmigo != null & eliminacionDeAmistad && 
+                    if (nombreUsuarioAmigo != null && eliminacionDeAmistad && 
                     clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callbackAmigo))
                     {
                         callbackAmigo.NotificarCambio();
@@ -612,12 +614,9 @@ namespace DobbleServicio
             {
                 bool aceptacionDeAmistad = GestorAmistad.AceptarSolicitud(idAmistad);
 
-                if (aceptacionDeAmistad)
+                if (aceptacionDeAmistad && clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callback))
                 {
-                    if (clientesConectados.TryGetValue(nombreUsuarioAmigo, out var callback))
-                    {
-                        callback.NotificarCambio();
-                    }
+                    callback.NotificarCambio();
                 }
 
                 return aceptacionDeAmistad;
@@ -983,7 +982,7 @@ namespace DobbleServicio
             }
         }
 
-        private void ProcesarCartaValida(Sala sala, Jugador jugador, Carta cartaCentral)
+        private static void ProcesarCartaValida(Sala sala, Jugador jugador, Carta cartaCentral)
         {
             jugador.PuntosEnPartida++;
             NotificarActualizacionDePuntosEnPartida(jugador.Usuario, jugador.PuntosEnPartida, sala);
@@ -992,7 +991,7 @@ namespace DobbleServicio
             AsignarNuevaCartaCentralOSalaFinalizada(sala);
         }
 
-        private void AsignarNuevaCartaCentralOSalaFinalizada(Sala sala)
+        private static void AsignarNuevaCartaCentralOSalaFinalizada(Sala sala)
         {
             if (sala.PartidaSala.Cartas.Any())
             {
